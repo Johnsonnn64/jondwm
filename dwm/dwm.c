@@ -827,7 +827,7 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
 		isCode = 0;
 	text = p;
 
-	w += 2; /* 1px padding on both sides */
+	w += sidepad * 2; /* 1px padding on both sides */
 	ret = x = m->ww - w;
 
 	drw_setscheme(drw, scheme[LENGTH(colors)]);
@@ -910,7 +910,7 @@ drawbar(Monitor *m)
 
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
-		tw = m->ww - drawstatusbar(m, bh, stext);
+		tw = m->ww - drawstatusbar(m, bh, stext) + 50;
 	}
 
 	for (c = m->clients; c; c = c->next) {
@@ -1036,13 +1036,18 @@ focusmon(const Arg *arg)
 static void
 focusmonx(const Arg *arg)
 {
-   Monitor *m;
-   for (m = mons; m && m->num != arg->i; m = m->next);
-   if (m == selmon)
-     return;
-   unfocus(selmon->sel, 0);
-   selmon = m;
-   focus(NULL);
+  Monitor *m;
+  for (m = mons; m && m->num != arg->i; m = m->next);
+  if (m == selmon)
+    return;
+  unfocus(selmon->sel, 0);
+  selmon = m;
+  focus(NULL);
+  if (selmon->sel) {
+    XWarpPointer(dpy, None, selmon->sel->win, 0, 0, 0, 0, selmon->sel->w/2, selmon->sel->h/2);
+  } else { 
+    XWarpPointer(dpy, None, m->barwin, 0, 0, 0, 0, m->mw / 2, m->mh / 2);
+  }
 }
 
 void

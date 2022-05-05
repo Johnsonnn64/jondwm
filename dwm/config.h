@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 2;        /* border pixel of windows */
+static const unsigned int borderpx  = 0;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
@@ -11,7 +11,7 @@ static const unsigned int gappoh    = 15;       /* horiz outer gap between windo
 static const unsigned int gappov    = 15;       /* vert outer gap between windows and screen edge */
 static const int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
 static const int user_bh            = 30;       /* user assigned bar height */
-static const int vertpad                 = 0;        /* statusbar verical padding */
+static const int vertpad                 = 15;        /* statusbar verical padding */
 static const int sidepad                 = 15;       /* statusbar side padding */
 static const unsigned int colorfultag    = 1;   /* 0 means use SchemeSel for selected tag */
 static const char *fonts[]               = { "JetBrainsMono Nerd Font:style=Medium:size=9:antialias=true",
@@ -48,7 +48,7 @@ static char *tags[] = {"󰮯", "󰧞", "󰑊", "󰧞", "󰑊", "󰧞", "󰑊"};
 
 static const unsigned int ulinepad      = 5;    /* horizontal padding between the underline and tag */
 static const unsigned int ulinestroke   = 2;    /* thickness / height of the underline */
-static const unsigned int ulinevoffset  = 0;    /* how far above the bottom of the bar the line should appear */
+static const unsigned int ulinevoffset  = 4;    /* how far above the bottom of the bar the line should appear */
 static const int ulineall               = 0;    /* 1 to show underline on all tags, 0 for just the active ones */
 
 static const Rule rules[] = {
@@ -98,7 +98,7 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, /*"-l", "12",*/ "-x", "15", "-z", "1890", NULL };
+static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, /*"-l", "12",*/ "-x", "15", "-y", "15", "-z", "1890", NULL };
 static const char *termcmd[]  = { "st", NULL };
 static const char *sscmd[] = { "scrot", "-F", "screenshot.png", "-o", "-s", "-f", "-e", "mv screenshot.png ~/personal/pictures/ && xclip -selection clipboard -target image/png -i ~/personal/pictures/screenshot.png", NULL};
 
@@ -177,6 +177,7 @@ static Key keys[] = {
   { MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
   { MODKEY,                       XK_period, focusmonx,      {.i = 1 } },
   { MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
+  { MODKEY,                       XK_space,  spawn,          SHCMD("dunstctl close-all") },
   { MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
 
   { MODKEY,                       XK_F7,     spawn,          SHCMD("dmenuumount.sh") },

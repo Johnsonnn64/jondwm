@@ -6,7 +6,7 @@
 interval=0
 
 # load colors
-. ~/.config/iamchad/scripts/catppuccin
+. ~/workspace/suckless/dwm/scripts/catppuccin
 
 
 #cpu() {
@@ -44,7 +44,7 @@ mem() {
 }
 
 wlan() {
-	case "$(cat /sys/class/net/enp37s0/operstate 2>/dev/null)" in
+	case "$(cat /sys/class/net/eth0/operstate 2>/dev/null)" in
 	up) printf "^c$blue^  󰤨 ^d^%s" " ^c$blue^Connected" ;;
 	down) printf "^c$red^  󰤭 ^d^%s" " ^c$red^Disconnected" ;;
 	esac
@@ -66,7 +66,6 @@ obake() {
   printf "^c$yellow^ 󰊠 "
   printf "^c$blue^ 󰊠 "
   printf "^c$purple^ 󰊠 "
-  printf "^c$purple^ 󰊠 "
 }
 obake=$(obake)
 
@@ -83,5 +82,5 @@ while true; do
 	[ $interval = 0 ] || [ $(($interval % 3600)) = 0 ] && updates=$(pkg_updates) # && curwea=$(weat)
 	interval=$((interval + 1))
 
-	sleep 1 && xsetroot -name "$(echo "$updates  $curwea   $(mem)  $(clock)   $obake           " | sed 's/   */  /g' | sed 's/   */  /g')"
+  sleep 1 && xsetroot -name "$(echo "$updates$(wlan)  $(mem)  $(clock)   $obake " | sed 's/   */  /g' | sed 's/   */  /g')"
 done
