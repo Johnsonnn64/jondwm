@@ -16,27 +16,42 @@ interval=0
 	#printf "^c$green^ $cpu_val"
 #}
 
-pkg_updates() {
-	# updates=$(sudo pacman -Sy  cl| wc -l) # void
-	updates=$(checkupdates | wc -l)   # arch , needs pacman contrib
-	# updates=$(aptitude search '~U' | wc -l)  # apt (ubuntu,debian etc)
+# pkg_updates() {
+# 	# updates=$(sudo pacman -Sy  cl| wc -l) # void
+# 	updates=$(checkupdates | wc -l)   # arch , needs pacman contrib
+# 	# updates=$(aptitude search '~U' | wc -l)  # apt (ubuntu,debian etc)
+#
+# 	if [ "$updates" == 0 ]; then
+# 		printf "^c$green^  Fully Updated"
+# 	else
+# 		printf "^c$green^  $updates"" updates"
+# 	fi
+# }
 
-	if [ "$updates" == 0 ]; then
-		printf "^c$green^  Fully Updated"
-	else
-		printf "^c$green^  $updates"" updates"
-	fi
+battery() {
+  if [ -f /sys/class/power_supply/BAT0/capacity ]; then
+    get_capacity="$(cat /sys/class/power_supply/BAT0/capacity)"
+    ac_state="$(cat /sys/class/power_supply/AC/online)"
+
+    if [ "$ac_state" == 1 ]; then
+      printf "^c$green^   $get_capacity"
+    else
+      if [ "$get_capacity" -le 20 ]; then
+        printf "^c$red^   $get_capacity"
+      else
+        printf "^c$yellow^   $get_capacity"
+      fi
+    fi
+  fi
 }
 
-# battery() {
-# 	get_capacity="$(cat /sys/class/power_supply/BAT1/capacity)"
-# 	printf "^c$blue^   $get_capacity"
-# }
-
-# brightness() {
-# 	printf "^c$red^   "
-# 	printf "^c$red^%.0f\n" $(cat /sys/class/backlight/*/brightness)
-# }
+brightness() {
+  if [ -f /sys/class/backlight/*/brightness ]; then
+    printf "^c$red^   "
+    printf "^c$red^%.0f\n" $(i=$(cat /sys/class/backlight/*/brightness)
+    echo $i/25 | bc)0
+  fi
+}
 
 mem() {
 	printf "^c$green^󰆼"
@@ -44,16 +59,14 @@ mem() {
 }
 
 wlan() {
-	case "$(cat /sys/class/net/eth0/operstate 2>/dev/null)" in
-	up) printf "^c$blue^  󰤨 ^d^%s" " ^c$blue^Connected" ;;
-	down) printf "^c$red^  󰤭 ^d^%s" " ^c$red^Disconnected" ;;
-	esac
+  state=$(for s in /sys/class/net/* ; do 
+    echo $s $(cat "$s/operstate")
+  done | grep up | awk '{print $2}')
+  case "$state" in
+    up) printf "^c$blue^  󰤨 ^d^%s" " ^c$blue^Connected" ;;
+    down) printf "^c$red^  󰤭 ^d^%s" " ^c$red^Disconnected" ;;
+  esac
 }
-
-# cal() {
-#   printf "^c$black^ ^b$darkblue^ 󰸗 "
-#   printf "^c$blue^^b$grey^ $(date '+%a, %m-%d') "
-# }
 
 clock() {
 	printf "^c$blue^󱑆"
@@ -65,7 +78,7 @@ obake() {
   printf "^c$red^ 󰊠 "
   printf "^c$yellow^ 󰊠 "
   printf "^c$blue^ 󰊠 "
-  printf "^c$purple^ 󰊠 "
+  printf "^c$purple^ 󰊠"
 }
 obake=$(obake)
 
@@ -79,8 +92,8 @@ obake=$(obake)
 
 while true; do
 
-	[ $interval = 0 ] || [ $(($interval % 3600)) = 0 ] && updates=$(pkg_updates) # && curwea=$(weat)
+	# [ $interval = 0 ] || [ $(($interval % 3600)) = 0 ] # && updates=$(pkg_updates)
 	interval=$((interval + 1))
 
-  sleep 1 && xsetroot -name "$(echo "$updates$(wlan)  $(mem)  $(clock)   $obake " | sed 's/   */  /g' | sed 's/   */  /g')"
+  sleep 1 && xsetroot -name "$(echo "$(wlan)  $(mem)  $(battery) $(brightness)  $(clock)   $obake " | sed 's/   */  /g' | sed 's/   */  /g')"
 done
