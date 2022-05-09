@@ -910,7 +910,7 @@ drawbar(Monitor *m)
 
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
-		tw = m->ww - drawstatusbar(m, bh, stext) + 50;
+		tw = m->ww - drawstatusbar(m, bh, stext);
 	}
 
 	for (c = m->clients; c; c = c->next) {
@@ -1038,7 +1038,7 @@ focusmonx(const Arg *arg)
 {
   Monitor *m;
   for (m = mons; m && m->num != arg->i; m = m->next);
-  if (m == selmon)
+  if (!m || m == selmon)
     return;
   unfocus(selmon->sel, 0);
   selmon = m;

@@ -66,7 +66,7 @@ static const Rule rules[] = {
   { NULL,		          "spfm",	   	 NULL,		    SPTAG(1),		  0,           1,			      -1 },
   { NULL,		          "spcalcu",   NULL,		    SPTAG(2),		  0,           1,			      -1 },
   { NULL,		          "spvolume",  NULL,		    SPTAG(3),		  1,           1,			      -1 },
-  { NULL,		          "spgotop",   NULL,		    SPTAG(4),		  1,           1,			      -1 },
+  { NULL,		          "sptop",     NULL,		    SPTAG(4),		  1,           1,			      -1 },
   { NULL,		          "spcurse",   NULL,		    SPTAG(5),		  0,           1,			      -1 },
 };
 
@@ -110,7 +110,7 @@ const char *spcmd1[] = {"st", "-n", "spterm", "-g", "120x34", NULL };
 const char *spcmd2[] = {"st", "-n", "spfm", "-g", "144x41", "-e", "lfrun", NULL };
 const char *spcmd3[] = {"st", "-n", "spcalcu", "-g", "80x30", "-e", "bc", "-lq", NULL };
 const char *spcmd4[] = {"st", "-n", "spvolume", "-g", "115x20", "-e", "pulsemixer", NULL };
-const char *spcmd5[] = {"st", "-n", "spgotop", "-g", "115x35", "-e", "gotop", NULL };
+const char *spcmd5[] = {"st", "-n", "sptop", "-g", "115x35", "-e", "btop", NULL };
 const char *spcmd6[] = {"st", "-n", "spcurse", "-g", "100x30+1200+5", "-e", "calcurse", NULL };
 static Sp scratchpads[] = {
   /* name          cmd  */
@@ -118,7 +118,7 @@ static Sp scratchpads[] = {
   {"splf",         spcmd2},
   {"spcalcu",      spcmd3},
   {"spvolume",     spcmd4},
-  {"spgotop",      spcmd5},
+  {"sptop",        spcmd5},
   {"spcurse",      spcmd6},
 };
 
@@ -180,6 +180,8 @@ static Key keys[] = {
   { MODKEY,                       XK_space,  spawn,          SHCMD("dunstctl close-all") },
   { MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
 
+  { MODKEY,                          XK_F5,          spawn,          SHCMD("sudo xbacklight -dec 5") },
+  { MODKEY,                          XK_F6,          spawn,          SHCMD("sudo xbacklight -inc 5") },
   { MODKEY,                       XK_F7,     spawn,          SHCMD("dmenuumount.sh") },
   { MODKEY,                       XK_F8,     spawn,          SHCMD("dmenumount.sh") },
   { MODKEY,                       XK_F9,     togglescratch,  {.ui = 2 } },
