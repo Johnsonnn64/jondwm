@@ -170,6 +170,7 @@ static Key keys[] = {
   { MODKEY|ControlMask,           XK_c,      togglescratch,  {.ui = 5} },
   { MODKEY|ControlMask,           XK_v,      togglescratch,  {.ui = 3} },
   { MODKEY,                       XK_b,      togglebar,      {0} },
+  { MODKEY|ControlMask,           XK_b,      spawn,          SHCMD("bluetoothdmenu.sh") },
   { MODKEY,                       XK_m,      setlayout,      {.v = &layouts[1]} },
   { MODKEY|ShiftMask,             XK_m,      movecenter,     {0} },
   { MODKEY,                       XK_n,      togglescratch,  {.ui = 1} },
@@ -180,8 +181,8 @@ static Key keys[] = {
   { MODKEY,                       XK_space,  spawn,          SHCMD("dunstctl close-all") },
   { MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
 
-  { MODKEY,                          XK_F5,          spawn,          SHCMD("sudo xbacklight -dec 5") },
-  { MODKEY,                          XK_F6,          spawn,          SHCMD("sudo xbacklight -inc 5") },
+  { MODKEY,                       XK_F5,     spawn,          SHCMD("sudo xbacklight -dec 5") },
+  { MODKEY,                       XK_F6,     spawn,          SHCMD("sudo xbacklight -inc 5") },
   { MODKEY,                       XK_F7,     spawn,          SHCMD("dmenuumount.sh") },
   { MODKEY,                       XK_F8,     spawn,          SHCMD("dmenumount.sh") },
   { MODKEY,                       XK_F9,     togglescratch,  {.ui = 2 } },
