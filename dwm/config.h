@@ -192,8 +192,6 @@ static Key keys[] = {
   { 0,                            XK_Print,  spawn,          {.v = sscmd } },
 
   // test
-	{MODKEY,						XK_o, 	   hidewin, 	   {0}},
-   {MODKEY|ShiftMask, 			    XK_o, 	   restorewin, 	   {0}},
    {MODKEY, 						XK_w, 	   hideotherwins,  {0}},
    {MODKEY|ShiftMask, 				XK_w, 	   restoreotherwins, {0}},
   

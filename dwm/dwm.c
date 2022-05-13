@@ -258,8 +258,8 @@ static void togglefullscr(const Arg *arg);
 static void togglescratch(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
-static void hidewin(const Arg *arg);
-static void restorewin(const Arg *arg);
+/* static void hidewin(const Arg *arg);
+static void restorewin(const Arg *arg); */
 static void hideotherwins(const Arg *arg);
 static void restoreotherwins(const Arg *arg);
 static void unfocus(Client *c, int setfocus);
@@ -2425,8 +2425,13 @@ togglefullscr(const Arg *arg)
 {
   if(selmon->sel) {
     setfullscreen(selmon->sel, !selmon->sel->isfullscreen);
-  }
+    if (selmon->sel->isfullscreen) {
+      hideotherwins(arg);
+    } else {
+      restoreotherwins(arg);
+    }
   togglebar(arg);
+  }
 }
 
 void
@@ -2479,7 +2484,7 @@ toggleview(const Arg *arg)
 		arrange(selmon);
 	}
 }
-
+/*
 void hidewin(const Arg *arg) {
   if (!selmon->sel)
     return;
@@ -2505,7 +2510,7 @@ void restorewin(const Arg *arg) {
     --i;
   }
 }
-
+*/
 void hideotherwins(const Arg *arg) {
   Client *c = NULL, *i;
   if (!selmon->sel)
@@ -2522,8 +2527,7 @@ void hideotherwins(const Arg *arg) {
 void restoreotherwins(const Arg *arg) {
   int i;
   for (i = 0; i <= hiddenWinStackTop; ++i) {
-    if (HIDDEN(hiddenWinStack[i]) &&
-      hiddenWinStack[i]->tags == selmon->tagset[selmon->seltags]) {
+    if (HIDDEN(hiddenWinStack[i])) {
       show(hiddenWinStack[i]);
       restack(selmon);
       memcpy(hiddenWinStack + i, hiddenWinStack + i + 1,
