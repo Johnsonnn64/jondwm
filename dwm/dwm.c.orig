@@ -50,7 +50,6 @@
 #define INTERSECT(x,y,w,h,m)    (MAX(0, MIN((x)+(w),(m)->wx+(m)->ww) - MAX((x),(m)->wx)) \
                                * MAX(0, MIN((y)+(h),(m)->wy+(m)->wh) - MAX((y),(m)->wy)))
 #define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]))
-#define HIDDEN(C)               ((getstate(C->win) == IconicState))
 #define LENGTH(X)               (sizeof X / sizeof X[0])
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
@@ -240,8 +239,6 @@ static void setmfact(const Arg *arg);
 static void setup(void);
 static void seturgent(Client *c, int urg);
 static void showhide(Client *c);
-static void show(Client *c);
-static void hide(Client *c);
 static void sigchld(int unused);
 static void sighup(int unused);
 static void sigterm(int unused);
@@ -258,10 +255,6 @@ static void togglefullscr(const Arg *arg);
 static void togglescratch(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
-static void hidewin(const Arg *arg);
-static void restorewin(const Arg *arg);
-static void hideotherwins(const Arg *arg);
-static void restoreotherwins(const Arg *arg);
 static void unfocus(Client *c, int setfocus);
 static void unmanage(Client *c, int destroyed);
 static void unmapnotify(XEvent *e);
@@ -320,10 +313,6 @@ static Display *dpy;
 static Drw *drw;
 static Monitor *mons, *selmon;
 static Window root, wmcheckwin;
-
-#define hiddenWinStackMax 100
-static int hiddenWinStackTop = -1;
-static Client *hiddenWinStack[hiddenWinStackMax];
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -455,15 +444,15 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact)
 void
 arrange(Monitor *m)
 {
-  if (m)
-    showhide(m->stack);
-  else for (m = mons; m; m = m->next)
-    showhide(m->stack);
-  if (m) {
-    arrangemon(m);
-    restack(m);
-  } else for (m = mons; m; m = m->next)
-    arrangemon(m);
+	if (m)
+		showhide(m->stack);
+	else for (m = mons; m; m = m->next)
+		showhide(m->stack);
+	if (m) {
+		arrangemon(m);
+		restack(m);
+	} else for (m = mons; m; m = m->next)
+		arrangemon(m);
 }
 
 void
@@ -998,8 +987,8 @@ expose(XEvent *e)
 void
 focus(Client *c)
 {
-	if (!c || (!ISVISIBLE(c) || HIDDEN(c)))
-		for (c = selmon->stack; c && (!ISVISIBLE(c) || HIDDEN(c)); c = c->snext);
+	if (!c || !ISVISIBLE(c))
+		for (c = selmon->stack; c && !ISVISIBLE(c); c = c->snext);
 	if (selmon->sel && selmon->sel != c)
 		unfocus(selmon->sel, 0);
 	if (c) {
@@ -1069,23 +1058,23 @@ focusstack(const Arg *arg)
 	if (!selmon->sel || (selmon->sel->isfullscreen && lockfullscreen))
 		return;
 	if (arg->i > 0) {
-		for (c = selmon->sel->next; c && (!ISVISIBLE(c) || HIDDEN(c)); c = c->next);
+		for (c = selmon->sel->next; c && !ISVISIBLE(c); c = c->next);
 		if (!c)
-			for (c = selmon->clients; c && (!ISVISIBLE(c) || HIDDEN(c)); c = c->next);
+			for (c = selmon->clients; c && !ISVISIBLE(c); c = c->next);
 	} else {
 		for (i = selmon->clients; i != selmon->sel; i = i->next)
-			if (ISVISIBLE(i) && !HIDDEN(i))
+			if (ISVISIBLE(i))
 				c = i;
 		if (!c)
 			for (; i; i = i->next)
-				if (ISVISIBLE(i) && !HIDDEN(i))
+				if (ISVISIBLE(i))
 					c = i;
 	}
 	if (c) {
 		focus(c);
 		restack(selmon);
-    XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w/2, c->h/2);
 	}
+  XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w/2, c->h/2);
 }
 
 Atom
@@ -1307,14 +1296,12 @@ manage(Window w, XWindowAttributes *wa)
 	XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend,
 		(unsigned char *) &(c->win), 1);
 	XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h); /* some windows require this */
-  if (!HIDDEN(c))
-    setclientstate(c, NormalState);
+	setclientstate(c, NormalState);
 	if (c->mon == selmon)
 		unfocus(selmon->sel, 0);
 	c->mon->sel = c;
 	arrange(c->mon);
-  if (!HIDDEN(c))
-    XMapWindow(dpy, c->win);
+	XMapWindow(dpy, c->win);
 	focus(NULL);
 }
 
@@ -1512,7 +1499,7 @@ moveresize(const Arg *arg) {
 Client *
 nexttiled(Client *c)
 {
-	for (; c && (c->isfloating || (!ISVISIBLE(c) || HIDDEN(c))); c = c->next);
+	for (; c && (c->isfloating || !ISVISIBLE(c)); c = c->next);
 	return c;
 }
 
@@ -2192,42 +2179,6 @@ showhide(Client *c)
 }
 
 void
-show(Client *c)
-{
-	if (!c || !HIDDEN(c))
-		return;
-
-	XMapWindow(dpy, c->win);
-	setclientstate(c, NormalState);
-	arrange(c->mon);
-}
-
-void
-hide(Client *c) {
-	if (!c || HIDDEN(c))
-		return;
-
-	Window w = c->win;
-	static XWindowAttributes ra, ca;
-
-	// more or less taken directly from blackbox's hide() function
-	XGrabServer(dpy);
-	XGetWindowAttributes(dpy, root, &ra);
-	XGetWindowAttributes(dpy, w, &ca);
-	// prevent UnmapNotify events
-	XSelectInput(dpy, root, ra.your_event_mask & ~SubstructureNotifyMask);
-	XSelectInput(dpy, w, ca.your_event_mask & ~StructureNotifyMask);
-	XUnmapWindow(dpy, w);
-	setclientstate(c, IconicState);
-	XSelectInput(dpy, root, ra.your_event_mask);
-	XSelectInput(dpy, w, ca.your_event_mask);
-	XUngrabServer(dpy);
-
-	focus(c->snext);
-	arrange(c->mon);
-}
-
-void
 sigchld(int unused)
 {
 	if (signal(SIGCHLD, sigchld) == SIG_ERR)
@@ -2479,61 +2430,6 @@ toggleview(const Arg *arg)
 		arrange(selmon);
 	}
 }
-
-void hidewin(const Arg *arg) {
-  if (!selmon->sel)
-    return;
-  Client *c = (Client *)selmon->sel;
-  hide(c);
-  hiddenWinStack[++hiddenWinStackTop] = c;
-}
-
-void restorewin(const Arg *arg) {
-  int i = hiddenWinStackTop;
-  while (i > -1) {
-    if (HIDDEN(hiddenWinStack[i]) &&
-      hiddenWinStack[i]->tags == selmon->tagset[selmon->seltags]) {
-      show(hiddenWinStack[i]);
-      focus(hiddenWinStack[i]);
-      restack(selmon);
-      for (int j = i; j < hiddenWinStackTop; ++j) {
-        hiddenWinStack[j] = hiddenWinStack[j + 1];
-      }
-      --hiddenWinStackTop;
-      return;
-    }
-    --i;
-  }
-}
-
-void hideotherwins(const Arg *arg) {
-  Client *c = NULL, *i;
-  if (!selmon->sel)
-    return;
-  c = (Client *)selmon->sel;
-  for (i = selmon->clients; i; i = i->next) {
-    if (i != c && ISVISIBLE(i)) {
-      hide(i);
-      hiddenWinStack[++hiddenWinStackTop] = i;
-    }
-  }
-}
-
-void restoreotherwins(const Arg *arg) {
-  int i;
-  for (i = 0; i <= hiddenWinStackTop; ++i) {
-    if (HIDDEN(hiddenWinStack[i]) &&
-      hiddenWinStack[i]->tags == selmon->tagset[selmon->seltags]) {
-      show(hiddenWinStack[i]);
-      restack(selmon);
-      memcpy(hiddenWinStack + i, hiddenWinStack + i + 1,
-             (hiddenWinStackTop - i) * sizeof(Client *));
-      --hiddenWinStackTop;
-      --i;
-    }
-  }
-}
-
 
 void
 unfocus(Client *c, int setfocus)
