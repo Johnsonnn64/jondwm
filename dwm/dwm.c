@@ -113,6 +113,7 @@ struct Client {
   Client *swallowing;
 	Monitor *mon;
 	Window win;
+  unsigned int spn;
 };
 
 typedef struct {
@@ -265,11 +266,12 @@ static void tile(Monitor *);
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void togglefullscr(const Arg *arg);
+static void togglesp(const Arg *arg);
 static void togglescratch(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
-/* static void hidewin(const Arg *arg);
-static void restorewin(const Arg *arg); */
+static void hidewin(const Arg *arg);
+static void restorewin(const Arg *arg);
 static void hideotherwins(const Arg *arg);
 static void restoreotherwins(const Arg *arg);
 static void unfocus(Client *c, int setfocus);
@@ -2472,8 +2474,24 @@ togglefloating(const Arg *arg)
 	arrange(selmon);
 }
 
+void 
 togglesp(const Arg *arg)
 {
+  Monitor *m;
+  Client *c;
+  Arg sparg = {.v = scratchpads[arg->ui].cmd};
+  for (m = mons; m; m = m->next);
+  for (c = m->clients; c; c = c->next) {
+    if (c->spn != arg->ui) {
+      return;
+    }
+    if (c->tags == selmon->tagset[selmon->seltags]) {
+      hide(c);
+    }
+    if (c->mon != selmon) {
+      
+    }
+  }
 }
 
 void
@@ -2577,7 +2595,7 @@ toggleview(const Arg *arg)
 		arrange(selmon);
 	}
 }
-/*
+
 void hidewin(const Arg *arg) {
   if (!selmon->sel)
     return;
@@ -2603,7 +2621,7 @@ void restorewin(const Arg *arg) {
     --i;
   }
 }
-*/
+
 void hideotherwins(const Arg *arg) {
   Client *c = NULL, *i;
   if (!selmon->sel)
