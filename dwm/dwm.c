@@ -106,14 +106,13 @@ struct Client {
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh, hintsvalid;
 	int bw, oldbw;
 	unsigned int tags;
-	int isfixed, iscentered, isfloating, isurgent, neverfocus, oldstate, isfullscreen, isterminal, noswallow;
+	int isfixed, iscentered, isfloating, isurgent, neverfocus, oldstate, isfullscreen, isterminal, noswallow, spn;
   pid_t pid;
 	Client *next;
 	Client *snext;
   Client *swallowing;
 	Monitor *mon;
 	Window win;
-  unsigned int spn;
 };
 
 typedef struct {
@@ -166,6 +165,7 @@ typedef struct {
 	int isterminal;
 	int noswallow;
 	int monitor;
+  int spn;
 } Rule;
 
 /* function declarations */
@@ -388,6 +388,7 @@ applyrules(Client *c)
 			c->noswallow  = r->noswallow;
 			c->iscentered = r->iscentered;
 			c->isfloating = r->isfloating;
+      c->spn = r->spn;
 			c->tags |= r->tags;
 			if ((r->tags & SPTAGMASK) && r->iscentered) {
 				c->x = c->mon->wx + (c->mon->ww / 2 - WIDTH(c) / 2);
@@ -1811,7 +1812,7 @@ tagnextmon(const Arg *arg)
 void
 tagprevmon(const Arg *arg)
 {
-	tagothermon(arg, -1);
+tagothermon(arg, -1);
 }
 
 void
@@ -2475,23 +2476,50 @@ togglefloating(const Arg *arg)
 }
 
 void 
-togglesp(const Arg *arg)
+togglesp(const Arg *arg) // 나는야 처녀충
 {
   Monitor *m;
   Client *c;
+  unsigned int virgin = 1;
+  unsigned int found = 0;
   Arg sparg = {.v = scratchpads[arg->ui].cmd};
-  for (m = mons; m; m = m->next);
-  for (c = m->clients; c; c = c->next) {
-    if (c->spn != arg->ui) {
-      return;
-    }
-    if (c->tags == selmon->tagset[selmon->seltags]) {
-      hide(c);
-    }
-    if (c->mon != selmon) {
-      
+  for (m = mons; m; m = m->next) {
+    for (c = m->clients; c; c = c->next) {
+      if (c->spn == arg->ui) {
+        found = 1;
+        if (c->mon == selmon) { // if on same mon
+          if (virgin && c->tags == selmon->tagset[selmon->seltags]) { // if sp is in the same tag
+            if (HIDDEN(c)) { // if it is hidden, show
+              show(c);
+              focus(c);
+            } else if (ISVISIBLE(c)) { // if it is shown, hide
+              hide(c);
+            }
+          } else if (c->tags != selmon->tagset[selmon->seltags]) { // if sp isn't in the same tag
+            if (HIDDEN(c)){
+              show(c);
+            }
+            c->tags = selmon->tagset[selmon->seltags] & TAGMASK;
+            focus(c);
+            virgin = 0;
+          }
+        } else if (c->mon != selmon) { // if on dif mon
+          if (HIDDEN(c)) {
+            show(c);
+          }
+          sendmon(c, selmon);
+          focus(c);
+          c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
+          c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
+          virgin = 0;
+        }
+      }
     }
   }
+  if (!found) {
+    spawn(&sparg);
+  }
+  arrange(selmon);
 }
 
 void
