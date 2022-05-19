@@ -56,20 +56,20 @@ static const Rule rules[] = {
   /*xprop(1):
     WM_CLASS(STRING) = instance, class
     WM_NAME(STRING) = title*/
-  /* class            instance    title         tags mask     iscentered   isfloating   isterminal    noswallow   monitor   spn */
-  { "St",             NULL,        NULL,        0,            0,           0,           1,            0,          -1, -1 }, 
-  { "zoom",           NULL,        NULL,        1 << 6,       1,           1,           0,            0,          -1, -1 },
-  { "YouTube Music",  NULL,        NULL,        1 << 5,       0,           0,           0,            0,           1, -1 },
-  { "discord",        NULL,        NULL,        1 << 5,       0,           0,           0,            0,           0, -1 },
-  { NULL,             "fcen",      NULL,        0,            1,           1,           0,            0,          -1, -1 },
-  { NULL,             "fl",        NULL,        0,            0,           1,           0,            0,          -1, -1 },
+  /* class            instance    title     tags mask   iscentered   isfloating   isterminal    noswallow   monitor   spn */
+  { "St",             NULL,        NULL,    0,          0,           0,           1,            0,          -1,       -1 }, 
+  { "zoom",           NULL,        NULL,    1 << 6,     1,           1,           0,            0,          -1,       -1 },
+  { "YouTube Music",  NULL,        NULL,    1 << 5,     0,           0,           0,            0,           1,       -1 },
+  { "discord",        NULL,        NULL,    1 << 5,     0,           0,           0,            0,           0,       -1 },
+  { NULL,             "fcen",      NULL,    0,          1,           1,           0,            0,          -1,       -1 },
+  { NULL,             "fl",        NULL,    0,          0,           1,           0,            0,          -1,       -1 },
   /* scratchpads*/
-  { NULL,		          "spterm",	 	 NULL,		    0/* SPTAG(0) */,		  0,           1,			      1,            0,          -1, 0 },
-  { NULL,		          "spfm",	   	 NULL,		    0/* SPTAG(1) */,		  0,           1,			      1,            0,          -1, 1 },
-  { NULL,		          "spcalcu",   NULL,		    0/* SPTAG(2) */,		  0,           1,			      0,            0,          -1, 2 },
-  { NULL,		          "spvolume",  NULL,		    0/* SPTAG(3) */,		  1,           1,			      0,            0,          -1, 3 },
-  { NULL,		          "sptop",     NULL,		    0/* SPTAG(4) */,		  1,           1,			      0,            0,          -1, 4 },
-  { NULL,		          "spcurse",   NULL,		    0/* SPTAG(5) */,		  0,           1,			      0,            0,          -1, 5 },
+  { NULL,		          "spterm",	 	 NULL,	  0,		      0,           1,			      1,            0,          -1,       0  },
+  { NULL,		          "spfm",	   	 NULL,	  0,		      0,           1,			      1,            0,          -1,       1  },
+  { NULL,		          "spcalcu",   NULL,	  0,		      0,           1,			      0,            0,          -1,       2  },
+  { NULL,		          "spvolume",  NULL,	  0,		      1,           1,			      0,            0,          -1,       3  },
+  { NULL,		          "sptop",     NULL,	  0,		      1,           1,			      0,            0,          -1,       4  },
+  { NULL,		          "spcurse",   NULL,	  0,		      0,           1,			      0,            0,          -1,       5  },
 };
 
 /* layout(s) */
@@ -149,7 +149,7 @@ static Key keys[] = {
 
   { MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
 	{ MODKEY,                       XK_f,      togglefullscr,  {0} },
-  { MODKEY,                       XK_g,      togglescratch,  { .ui = 4 } },
+  { MODKEY,                       XK_g,      togglesp,       { .ui = 4 } },
   { MODKEY,                       XK_h,      setmfact,       {.f = -0.025 } },
   { MODKEY|ShiftMask,             XK_h,      setcfact,       {.f = -0.25 } },
   { MODKEY|ShiftMask|ControlMask, XK_h,      moveresize,     {.v = "0x 0y -25w 0h" } },
@@ -167,15 +167,15 @@ static Key keys[] = {
   { MODKEY|ShiftMask|ControlMask, XK_l,      moveresize,     {.v = "0x 0y 25w 0h" } },
   { ControlMask|ShiftMask,        XK_l,      moveresize,     {.v = "25x 0y 0w 0h" } },
   { MODKEY,                       XK_Return, zoom,           {0} },
-  { MODKEY|ShiftMask,             XK_Return, togglescratch,  {.ui = 0 } },
+  { MODKEY|ShiftMask,             XK_Return, togglesp,       {.ui = 0 } },
 
-  { MODKEY|ControlMask,           XK_c,      togglescratch,  {.ui = 5} },
-  { MODKEY|ControlMask,           XK_v,      togglescratch,  {.ui = 3} },
+  { MODKEY|ControlMask,           XK_c,      togglesp,       {.ui = 5} },
+  { MODKEY|ControlMask,           XK_v,      togglesp,       {.ui = 3} },
   { MODKEY,                       XK_b,      togglebar,      {0} },
   { MODKEY|ControlMask,           XK_b,      spawn,          SHCMD("bluetoothdmenu.sh") },
   { MODKEY,                       XK_m,      setlayout,      {.v = &layouts[1]} },
   { MODKEY|ShiftMask,             XK_m,      movecenter,     {0} },
-  { MODKEY,                       XK_n,      togglescratch,  {.ui = 1} },
+  { MODKEY,                       XK_n,      togglesp,       {.ui = 1} },
   { MODKEY,                       XK_comma,  focusmonx,      {.i = 0 } },
   { MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
   { MODKEY,                       XK_period, focusmonx,      {.i = 1 } },
@@ -187,16 +187,15 @@ static Key keys[] = {
   { MODKEY,                       XK_F6,     spawn,          SHCMD("sudo xbacklight -inc 5") },
   { MODKEY,                       XK_F7,     spawn,          SHCMD("dmenuumount.sh") },
   { MODKEY,                       XK_F8,     spawn,          SHCMD("dmenumount.sh") },
-  { MODKEY,                       XK_F9,     togglescratch,  {.ui = 2 } },
+  { MODKEY,                       XK_F9,     togglesp,       {.ui = 2 } },
   { MODKEY,                       XK_F10,    spawn,          SHCMD("playerctl play-pause") },
   { MODKEY,                       XK_F11,    spawn,          SHCMD("playerctl previous") },
   { MODKEY,                       XK_F12,    spawn,          SHCMD("playerctl next") },
   { 0,                            XK_Print,  spawn,          {.v = sscmd } },
 
   // test
-   {MODKEY, 						XK_w, 	   hideotherwins,  {0}},
-   {MODKEY|ShiftMask, 				XK_w, 	   restoreotherwins, {0}},
-   {MODKEY, 						XK_z, 	   togglesp,  {.ui = 0 } },
+  {MODKEY, 						XK_w, 	   hideotherwins,  {0}},
+  {MODKEY|ShiftMask, 				XK_w, 	   restoreotherwins, {0}},
   
 };
 
