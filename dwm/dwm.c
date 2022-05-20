@@ -262,14 +262,15 @@ static void tagothermon(const Arg *arg, int dir);
 static void tile(Monitor *);
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
-static void togglefullscr(const Arg *arg);
 static void togglesp(const Arg *arg);
+static void togglefullscr(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void hidewin(const Arg *arg);
 static void restorewin(const Arg *arg);
 static void hideotherwins(const Arg *arg);
 static void restoreotherwins(const Arg *arg);
+static void restoreclientwin(Client *c);
 static void unfocus(Client *c, int setfocus);
 static void unmanage(Client *c, int destroyed);
 static void unmapnotify(XEvent *e);
@@ -1302,9 +1303,8 @@ killclient(const Arg *arg)
 {
   if (!selmon->sel)
     return;
-  if (selmon->sel && selmon->sel->isfullscreen) { 
+  if (selmon->sel->isfullscreen) { 
     restoreotherwins(arg);
-    togglebar(arg);
   }
   if (!sendevent(selmon->sel, wmatom[WMDelete])) {
     XGrabServer(dpy);
@@ -2481,18 +2481,33 @@ togglesp(const Arg *arg) // 나는야 처녀충
             if (HIDDEN(c)) { // if it is hidden, show
               show(c);
               focus(c);
+              if (c->isfullscreen) {
+                hideotherwins(arg);
+              }
             } else if (ISVISIBLE(c)) { // if it is shown, hide
               hide(c);
+              if (c->isfullscreen) {
+                restoreclientwin(c);
+              }
             }
           } else if (c->tags != selmon->tagset[selmon->seltags]) { // if sp isn't in the same tag
+            if (c->isfullscreen) {
+              restoreclientwin(c);
+            }
             if (HIDDEN(c)){
               show(c);
             }
             c->tags = selmon->tagset[selmon->seltags] & TAGMASK;
             focus(c);
+            if (c->isfullscreen) {
+              hideotherwins(arg);
+            }
             virgin = 0;
           }
         } else if (c->mon != selmon) { // if on dif mon
+          if (c->isfullscreen) {
+            restoreclientwin(c);
+          }
           if (HIDDEN(c)) {
             show(c);
           }
@@ -2500,6 +2515,9 @@ togglesp(const Arg *arg) // 나는야 처녀충
           focus(c);
           c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
           c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
+          if (c->isfullscreen) {
+            hideotherwins(arg);
+          }
           virgin = 0;
         }
       }
@@ -2518,12 +2536,8 @@ togglefullscr(const Arg *arg)
     setfullscreen(selmon->sel, !selmon->sel->isfullscreen);
     if (selmon->sel->isfullscreen) {
       hideotherwins(arg);
-      if (selmon->showbar)
-        togglebar(arg);
     } else {
       restoreotherwins(arg);
-      if (!selmon->showbar)
-        togglebar(arg);
     }
   }
 }
@@ -2623,7 +2637,7 @@ void restoreotherwins(const Arg *arg) {
   int i;
   for (i = 0; i <= hiddenWinStackTop; ++i) {
     if (HIDDEN(hiddenWinStack[i]) &&
-      hiddenWinStack[i]->tags == selmon->tagset[selmon->seltags]) {
+      hiddenWinStack[i]->tags == selmon->tagset[selmon->seltags] && hiddenWinStack[i]->spn == -1) {
       show(hiddenWinStack[i]);
       restack(selmon);
       memcpy(hiddenWinStack + i, hiddenWinStack + i + 1,
@@ -2634,6 +2648,19 @@ void restoreotherwins(const Arg *arg) {
   }
 }
 
+void restoreclientwin(Client *c) {
+  int i;
+  for (i = 0; i <= hiddenWinStackTop; ++i) {
+    if (HIDDEN(hiddenWinStack[i]) && hiddenWinStack[i]->tags == c->tags && hiddenWinStack[i]->spn == -1) {
+      show(hiddenWinStack[i]);
+      restack(selmon);
+      memcpy(hiddenWinStack + i, hiddenWinStack + i + 1,
+             (hiddenWinStackTop - i) * sizeof(Client *));
+      --hiddenWinStackTop;
+      --i;
+    }
+  }
+}
 
 void
 unfocus(Client *c, int setfocus)

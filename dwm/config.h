@@ -60,7 +60,6 @@ static const Rule rules[] = {
   { "St",             NULL,        NULL,    0,          0,           0,           1,            0,          -1,       -1 }, 
   { "zoom",           NULL,        NULL,    1 << 6,     1,           1,           0,            0,          -1,       -1 },
   { "YouTube Music",  NULL,        NULL,    1 << 5,     0,           0,           0,            0,           1,       -1 },
-  { "discord",        NULL,        NULL,    1 << 5,     0,           0,           0,            0,           0,       -1 },
   { NULL,             "fcen",      NULL,    0,          1,           1,           0,            0,          -1,       -1 },
   { NULL,             "fl",        NULL,    0,          0,           1,           0,            0,          -1,       -1 },
   /* scratchpads*/
@@ -70,6 +69,7 @@ static const Rule rules[] = {
   { NULL,		          "spvolume",  NULL,	  0,		      1,           1,			      0,            0,          -1,       3  },
   { NULL,		          "sptop",     NULL,	  0,		      1,           1,			      0,            0,          -1,       4  },
   { NULL,		          "spcurse",   NULL,	  0,		      0,           1,			      0,            0,          -1,       5  },
+  { "discord",        NULL,        NULL,    0,          0,           1,           0,            0,          -1,       6  },
 };
 
 /* layout(s) */
@@ -114,6 +114,7 @@ const char *spcmd3[] = {"st", "-n", "spcalcu", "-g", "80x30", "-e", "bc", "-lq",
 const char *spcmd4[] = {"st", "-n", "spvolume", "-g", "115x20", "-e", "pulsemixer", NULL };
 const char *spcmd5[] = {"st", "-n", "sptop", "-g", "115x35", "-e", "btop", NULL };
 const char *spcmd6[] = {"st", "-n", "spcurse", "-g", "100x30+1200+5", "-e", "calcurse", NULL };
+const char *dcmd[] = {"discord", NULL };
 static Sp scratchpads[] = {
   /* name          cmd  */
   {"spterm",       spcmd1},
@@ -122,6 +123,7 @@ static Sp scratchpads[] = {
   {"spvolume",     spcmd4},
   {"sptop",        spcmd5},
   {"spcurse",      spcmd6},
+  {"dcmd",         dcmd},
 };
 
 #include "movestack.c"
@@ -148,6 +150,7 @@ static Key keys[] = {
   { MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 
   { MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
+  { MODKEY|ControlMask,           XK_d,      togglesp,       {.ui = 6 } },
 	{ MODKEY,                       XK_f,      togglefullscr,  {0} },
   { MODKEY,                       XK_g,      togglesp,       { .ui = 4 } },
   { MODKEY,                       XK_h,      setmfact,       {.f = -0.025 } },
