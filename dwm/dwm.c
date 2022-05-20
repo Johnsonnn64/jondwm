@@ -369,6 +369,7 @@ applyrules(Client *c)
 	/* rule matching */
 	c->iscentered = 0;
 	c->isfloating = 0;
+  c->spn = -1;
 	c->tags = 0;
 	XGetClassHint(dpy, c->win, &ch);
 	class    = ch.res_class ? ch.res_class : broken;
