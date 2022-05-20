@@ -59,7 +59,6 @@ static const Rule rules[] = {
   /* class            instance    title     tags mask   iscentered   isfloating   isterminal    noswallow   monitor   spn */
   { "St",             NULL,        NULL,    0,          0,           0,           1,            0,          -1,       -1 }, 
   { "zoom",           NULL,        NULL,    1 << 6,     1,           1,           0,            0,          -1,       -1 },
-  { "YouTube Music",  NULL,        NULL,    1 << 5,     0,           0,           0,            0,           1,       -1 },
   { NULL,             "fcen",      NULL,    0,          1,           1,           0,            0,          -1,       -1 },
   { NULL,             "fl",        NULL,    0,          0,           1,           0,            0,          -1,       -1 },
   /* scratchpads*/
@@ -70,6 +69,7 @@ static const Rule rules[] = {
   { NULL,		          "sptop",     NULL,	  0,		      1,           1,			      0,            0,          -1,       4  },
   { NULL,		          "spcurse",   NULL,	  0,		      0,           1,			      0,            0,          -1,       5  },
   { "discord",        NULL,        NULL,    0,          0,           1,           0,            0,          -1,       6  },
+  { "YouTube Music",  NULL,        NULL,    1,          0,           1,           0,            0,          -1,       7  },
 };
 
 /* layout(s) */
@@ -115,6 +115,7 @@ const char *spcmd4[] = {"st", "-n", "spvolume", "-g", "115x20", "-e", "pulsemixe
 const char *spcmd5[] = {"st", "-n", "sptop", "-g", "115x35", "-e", "btop", NULL };
 const char *spcmd6[] = {"st", "-n", "spcurse", "-g", "100x30+1200+5", "-e", "calcurse", NULL };
 const char *dcmd[] = {"discord", NULL };
+const char *ytmcmd[] = {"youtube-music", NULL };
 static Sp scratchpads[] = {
   /* name          cmd  */
   {"spterm",       spcmd1},
@@ -124,6 +125,7 @@ static Sp scratchpads[] = {
   {"sptop",        spcmd5},
   {"spcurse",      spcmd6},
   {"dcmd",         dcmd},
+  {"ytmcmd",       ytmcmd},
 };
 
 #include "movestack.c"
@@ -176,9 +178,10 @@ static Key keys[] = {
   { MODKEY|ControlMask,           XK_v,      togglesp,       {.ui = 3} },
   { MODKEY,                       XK_b,      togglebar,      {0} },
   { MODKEY|ControlMask,           XK_b,      spawn,          SHCMD("bluetoothdmenu.sh") },
+  { MODKEY,                       XK_n,      togglesp,       {.ui = 1} },
   { MODKEY,                       XK_m,      setlayout,      {.v = &layouts[1]} },
   { MODKEY|ShiftMask,             XK_m,      movecenter,     {0} },
-  { MODKEY,                       XK_n,      togglesp,       {.ui = 1} },
+  { MODKEY|ControlMask,           XK_m,      togglesp,       {.ui = 7} },
   { MODKEY,                       XK_comma,  focusmonx,      {.i = 0 } },
   { MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
   { MODKEY,                       XK_period, focusmonx,      {.i = 1 } },
