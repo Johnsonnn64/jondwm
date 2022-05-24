@@ -103,7 +103,7 @@ struct Client {
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh, hintsvalid;
 	int bw, oldbw;
 	unsigned int tags;
-	int isfixed, iscentered, isfloating, isurgent, neverfocus, oldstate, isfullscreen, isterminal, noswallow, spn;
+	int isfixed, iscentered, isfloating, isurgent, neverfocus, oldstate, isfullscreen, isterminal, noswallow, spnum;
   pid_t pid;
 	Client *next;
 	Client *snext;
@@ -162,7 +162,7 @@ typedef struct {
 	int isterminal;
 	int noswallow;
 	int monitor;
-  int spn;
+  int spnum;
 } Rule;
 
 /* function declarations */
@@ -370,7 +370,7 @@ applyrules(Client *c)
 	/* rule matching */
 	c->iscentered = 0;
 	c->isfloating = 0;
-  c->spn = -1;
+  c->spnum = -1;
 	c->tags = 0;
 	XGetClassHint(dpy, c->win, &ch);
 	class    = ch.res_class ? ch.res_class : broken;
@@ -386,7 +386,7 @@ applyrules(Client *c)
 			c->noswallow  = r->noswallow;
 			c->iscentered = r->iscentered;
 			c->isfloating = r->isfloating;
-      c->spn = r->spn;
+      c->spnum = r->spnum;
 			c->tags |= r->tags;
 
 			for (m = mons; m && m->num != r->monitor; m = m->next);
@@ -992,11 +992,9 @@ drawbar(Monitor *m)
   }
 
   for (c = m->clients; c; c = c->next) {
-    if (c->spn == -1) {
       occ |= c->tags;
       if (c->isurgent)
         urg |= c->tags;
-    }
   }
   x = 0;
   for (i = 0; i < LENGTH(tags); i++) {
@@ -2462,69 +2460,34 @@ togglefloating(const Arg *arg)
 	arrange(selmon);
 }
 
-void 
-togglesp(const Arg *arg) // 나는야 처녀충
+void
+togglesp(const Arg *arg) 
 {
   Monitor *m;
   Client *c;
-  unsigned int virgin = 1;
   unsigned int found = 0;
   Arg sparg = {.v = scratchpads[arg->ui].cmd};
   for (m = mons; m; m = m->next) {
-    for (c = m->clients; c; c = c->next) {
-      if (c->spn == arg->ui) {
-        found = 1;
-        if (c->mon == selmon) { // if on same mon
-          if (virgin && c->tags == selmon->tagset[selmon->seltags]) { // if sp is in the same tag
-            if (HIDDEN(c)) { // if it is hidden, show
-              show(c);
-              focus(c);
-              if (c->isfullscreen) {
-                hideotherwins(arg);
-              }
-            } else if (ISVISIBLE(c)) { // if it is shown, hide
-              hide(c);
-              if (c->isfullscreen) {
-                restoreclientwin(c);
-              }
-            }
-          } else if (c->tags != selmon->tagset[selmon->seltags]) { // if sp isn't in the same tag
-            if (c->isfullscreen) {
-              restoreclientwin(c);
-            }
-            if (HIDDEN(c)){
-              show(c);
-            }
-            c->tags = selmon->tagset[selmon->seltags] & TAGMASK;
-            focus(c);
-            if (c->isfullscreen) {
-              hideotherwins(arg);
-            }
-            virgin = 0;
-          }
-        } else if (c->mon != selmon) { // if on dif mon
-          if (c->isfullscreen) {
-            restoreclientwin(c);
-          }
-          if (HIDDEN(c)) {
-            show(c);
-          }
-          sendmon(c, selmon);
-          focus(c);
-          c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
-          c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
-          if (c->isfullscreen) {
-            hideotherwins(arg);
-          }
-          virgin = 0;
-        }
-      }
-    }
+    for (c = m->clients; c && !(found = c->spnum == arg->ui); c = c->next);
+    if (found) break;
   }
-  if (!found) {
+  if (found) {
+    if (m == selmon) {
+      c->tags = ISVISIBLE(c) ? 0 : selmon->tagset[selmon->seltags];
+    } else if (m != selmon) {
+      sendmon(c, selmon);
+      c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
+      c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
+    }
+    focus(NULL);
+    arrange(selmon);
+    if (ISVISIBLE(c)) {
+      focus(c);
+      restack(selmon);
+    }
+  } else {
     spawn(&sparg);
   }
-  arrange(selmon);
 }
 
 void
@@ -2635,7 +2598,7 @@ void restoreotherwins(const Arg *arg) {
   int i;
   for (i = 0; i <= hiddenWinStackTop; ++i) {
     if (HIDDEN(hiddenWinStack[i]) &&
-      hiddenWinStack[i]->tags == selmon->tagset[selmon->seltags] && hiddenWinStack[i]->spn == -1) {
+      hiddenWinStack[i]->tags == selmon->tagset[selmon->seltags] && hiddenWinStack[i]->spnum == -1) {
       show(hiddenWinStack[i]);
       restack(selmon);
       memcpy(hiddenWinStack + i, hiddenWinStack + i + 1,
@@ -2649,7 +2612,7 @@ void restoreotherwins(const Arg *arg) {
 void restoreclientwin(Client *c) {
   int i;
   for (i = 0; i <= hiddenWinStackTop; ++i) {
-    if (HIDDEN(hiddenWinStack[i]) && hiddenWinStack[i]->tags == c->tags && hiddenWinStack[i]->spn == -1) {
+    if (HIDDEN(hiddenWinStack[i]) && hiddenWinStack[i]->tags == c->tags && hiddenWinStack[i]->spnum == -1) {
       show(hiddenWinStack[i]);
       restack(selmon);
       memcpy(hiddenWinStack + i, hiddenWinStack + i + 1,
