@@ -2473,6 +2473,7 @@ togglesp(const Arg *arg)
   }
   if (found) {
     if (m == selmon) {
+      if (c->isfullscreen) restoreclientwin(c);
       c->tags = ISVISIBLE(c) ? 0 : selmon->tagset[selmon->seltags];
     } else if (m != selmon) {
       sendmon(c, selmon);
@@ -2484,6 +2485,7 @@ togglesp(const Arg *arg)
     if (ISVISIBLE(c)) {
       focus(c);
       restack(selmon);
+      if (c->isfullscreen) hideotherwins(arg);
     }
   } else {
     spawn(&sparg);
@@ -2495,11 +2497,7 @@ togglefullscr(const Arg *arg)
 {
   if(selmon->sel) {
     setfullscreen(selmon->sel, !selmon->sel->isfullscreen);
-    if (selmon->sel->isfullscreen) {
-      hideotherwins(arg);
-    } else {
-      restoreotherwins(arg);
-    }
+    selmon->sel->isfullscreen ? hideotherwins(arg) : restoreotherwins(arg);
   }
 }
 
@@ -2598,7 +2596,7 @@ void restoreotherwins(const Arg *arg) {
   int i;
   for (i = 0; i <= hiddenWinStackTop; ++i) {
     if (HIDDEN(hiddenWinStack[i]) &&
-      hiddenWinStack[i]->tags == selmon->tagset[selmon->seltags] && hiddenWinStack[i]->spnum == -1) {
+      hiddenWinStack[i]->tags == selmon->tagset[selmon->seltags]) {
       show(hiddenWinStack[i]);
       restack(selmon);
       memcpy(hiddenWinStack + i, hiddenWinStack + i + 1,
@@ -2612,7 +2610,7 @@ void restoreotherwins(const Arg *arg) {
 void restoreclientwin(Client *c) {
   int i;
   for (i = 0; i <= hiddenWinStackTop; ++i) {
-    if (HIDDEN(hiddenWinStack[i]) && hiddenWinStack[i]->tags == c->tags && hiddenWinStack[i]->spnum == -1) {
+    if (HIDDEN(hiddenWinStack[i]) && hiddenWinStack[i]->tags == c->tags) {
       show(hiddenWinStack[i]);
       restack(selmon);
       memcpy(hiddenWinStack + i, hiddenWinStack + i + 1,
