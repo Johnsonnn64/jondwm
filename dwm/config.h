@@ -75,7 +75,7 @@ static const Rule rules[] = {
 /* layout(s) */
 static const float mfact     = 0.50; /* factor of master area size [0.05..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
-static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
+static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
 
 static const Layout layouts[] = {
@@ -151,6 +151,7 @@ static Key keys[] = {
   { MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
   { MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 
+  { MODKEY|ControlMask,           XK_s,      togglesp,       {.ui = 7} },
   { MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
   { MODKEY|ControlMask,           XK_d,      togglesp,       {.ui = 6 } },
 	{ MODKEY,                       XK_f,      togglefullscr,  {0} },
@@ -181,7 +182,6 @@ static Key keys[] = {
   { MODKEY,                       XK_n,      togglesp,       {.ui = 1} },
   { MODKEY,                       XK_m,      setlayout,      {.v = &layouts[1]} },
   { MODKEY|ShiftMask,             XK_m,      movecenter,     {0} },
-  { MODKEY|ControlMask,           XK_m,      togglesp,       {.ui = 7} },
   { MODKEY,                       XK_comma,  focusmonx,      {.i = 0 } },
   { MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
   { MODKEY,                       XK_period, focusmonx,      {.i = 1 } },
@@ -195,8 +195,6 @@ static Key keys[] = {
   { MODKEY,                       XK_F8,     spawn,          SHCMD("dmenumount.sh") },
   { MODKEY,                       XK_F9,     togglesp,       {.ui = 2 } },
   { MODKEY,                       XK_F10,    spawn,          SHCMD("playerctl play-pause") },
-  { MODKEY,                       XK_F11,    spawn,          SHCMD("playerctl previous") },
-  { MODKEY,                       XK_F12,    spawn,          SHCMD("playerctl next") },
   { 0,                            XK_Print,  spawn,          {.v = sscmd } },
 
   // test
