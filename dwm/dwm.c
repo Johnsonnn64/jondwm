@@ -1834,6 +1834,10 @@ sendmon(Client *c, Monitor *m)
 	c->tags = m->tagset[m->seltags]; /* assign tags of target monitor */
 	attachabove(c);
 	attachstack(c);
+  if (c->isfloating == 1) {
+    c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
+    c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
+  }
 	focus(NULL);
 	arrange(NULL);
 }
@@ -2477,8 +2481,6 @@ togglesp(const Arg *arg)
       c->tags = ISVISIBLE(c) ? 0 : selmon->tagset[selmon->seltags];
     } else if (m != selmon) {
       sendmon(c, selmon);
-      c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
-      c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
     }
     focus(NULL);
     arrange(selmon);
