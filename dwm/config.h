@@ -59,8 +59,9 @@ static const Rule rules[] = {
   /* class            instance    title   tags mask  iscentered  isfloating  isterminal  noswallow  monitor  spnum*/
   { "St",             NULL,        NULL,  0,         0,          0,          1,          0,         -1,      -1 }, 
   { "zoom",           NULL,        NULL,  1 << 6,    1,          1,          0,          0,         -1,      -1 },
-  { NULL,             "fcen",      NULL,  0,         1,          1,          0,          0,         -1,      -1 },
-  { NULL,             "fl",        NULL,  0,         0,          1,          0,          0,         -1,      -1 },
+  { "Dragon-drop",    NULL,        NULL,  0,         0,          1,          0,          1,         -1,      -1 },
+  { NULL,             "fcen",      NULL,  0,         1,          1,          0,          1,         -1,      -1 },
+  { NULL,             "fl",        NULL,  0,         0,          1,          0,          1,         -1,      -1 },
   /* scratchpads*/
   { NULL,		          "spterm",	 	 NULL,	0,		     0,          1,			     1,          0,         -1,      0  },
   { NULL,		          "spfm",	   	 NULL,	0,		     0,          1,			     1,          0,         -1,      1  },
@@ -69,7 +70,7 @@ static const Rule rules[] = {
   { NULL,		          "sptop",     NULL,	0,		     1,          1,			     0,          0,         -1,      4  },
   { NULL,		          "spcurse",   NULL,	0,		     0,          1,			     0,          0,         -1,      5  },
   { "discord",        NULL,        NULL,  0,         0,          1,          0,          0,         -1,      6  },
-  { "YouTube Music",  NULL,        NULL,  1,         0,          1,          0,          0,         -1,      7  },
+  { "YouTube Music",  NULL,        NULL,  0,         0,          1,          0,          0,         -1,      7  },
 };
 
 /* layout(s) */
