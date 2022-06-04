@@ -392,6 +392,8 @@ applyrules(Client *c)
 			for (m = mons; m && m->num != r->monitor; m = m->next);
 			if (m)
 				c->mon = m;
+    /* if (!strcmp(r->class, "Dragon-drop"))
+    XRaiseWindow(dpy, c->win); */
 		}
 	}
 	if (ch.res_class)
@@ -1732,26 +1734,26 @@ resizemouse(const Arg *arg)
 void
 restack(Monitor *m)
 {
-	Client *c;
-	XEvent ev;
-	XWindowChanges wc;
+  Client *c;
+  XEvent ev;
+  XWindowChanges wc;
 
-	drawbar(m);
-	if (!m->sel)
-		return;
-	if (m->sel->isfloating || !m->lt[m->sellt]->arrange)
-		XRaiseWindow(dpy, m->sel->win);
-	if (m->lt[m->sellt]->arrange) {
-		wc.stack_mode = Below;
-		wc.sibling = m->barwin;
-		for (c = m->stack; c; c = c->snext)
-			if (!c->isfloating && ISVISIBLE(c)) {
-				XConfigureWindow(dpy, c->win, CWSibling|CWStackMode, &wc);
-				wc.sibling = c->win;
-			}
-	}
-	XSync(dpy, False);
-	while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+  drawbar(m);
+  if (!m->sel)
+    return;
+  if (m->sel->isfloating || !m->lt[m->sellt]->arrange)
+    XRaiseWindow(dpy, m->sel->win);
+  if (m->lt[m->sellt]->arrange) {
+    wc.stack_mode = Below;
+    wc.sibling = m->barwin;
+    for (c = m->stack; c; c = c->snext)
+      if (!c->isfloating && ISVISIBLE(c)) {
+        XConfigureWindow(dpy, c->win, CWSibling|CWStackMode, &wc);
+        wc.sibling = c->win;
+    }
+  }
+  XSync(dpy, False);
+  while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
 void

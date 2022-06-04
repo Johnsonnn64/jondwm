@@ -56,21 +56,21 @@ static const Rule rules[] = {
   /*xprop(1):
     WM_CLASS(STRING) = instance, class
     WM_NAME(STRING) = title*/
-  /* class            instance    title   tags mask  iscentered  isfloating  isterminal  noswallow  monitor  spnum*/
-  { "St",             NULL,        NULL,  0,         0,          0,          1,          0,         -1,      -1 }, 
-  { "zoom",           NULL,        NULL,  1 << 6,    1,          1,          0,          0,         -1,      -1 },
-  { "Dragon-drop",    NULL,        NULL,  0,         0,          1,          0,          1,         -1,      -1 },
-  { NULL,             "fcen",      NULL,  0,         1,          1,          0,          1,         -1,      -1 },
-  { NULL,             "fl",        NULL,  0,         0,          1,          0,          1,         -1,      -1 },
+  /* class            instance    title   tags mask  iscentered  isfloating  isterminal  noswallow  mon  spnum*/
+  { "St",             NULL,        NULL,  0,         0,          0,          1,          0,         -1,   -1 }, 
+  { "zoom",           NULL,        NULL,  1 << 6,    1,          1,          0,          0,         -1,   -1 },
+  { "Dragon-drop",    NULL,        NULL,  ~0,        0,          1,          0,          1,         -1,   -1 },
+  { NULL,             "fcen",      NULL,  0,         1,          1,          0,          1,         -1,   -1 },
+  { NULL,             "fl",        NULL,  0,         0,          1,          0,          1,         -1,   -1 },
   /* scratchpads*/
-  { NULL,		          "spterm",	 	 NULL,	0,		     0,          1,			     1,          0,         -1,      0  },
-  { NULL,		          "spfm",	   	 NULL,	0,		     0,          1,			     1,          0,         -1,      1  },
-  { NULL,		          "spcalcu",   NULL,	0,		     0,          1,			     0,          0,         -1,      2  },
-  { NULL,		          "spvolume",  NULL,	0,		     1,          1,			     0,          0,         -1,      3  },
-  { NULL,		          "sptop",     NULL,	0,		     1,          1,			     0,          0,         -1,      4  },
-  { NULL,		          "spcurse",   NULL,	0,		     0,          1,			     0,          0,         -1,      5  },
-  { "discord",        NULL,        NULL,  0,         0,          1,          0,          0,         -1,      6  },
-  { "YouTube Music",  NULL,        NULL,  0,         0,          1,          0,          0,         -1,      7  },
+  { NULL,		          "spterm",	 	 NULL,	0,		     0,          1,			     1,          0,         -1,   0  },
+  { NULL,		          "spfm",	   	 NULL,	0,		     0,          1,			     1,          0,         -1,   1  },
+  { NULL,		          "spcalcu",   NULL,	0,		     0,          1,			     0,          0,         -1,   2  },
+  { NULL,		          "spvolume",  NULL,	0,		     1,          1,			     0,          0,         -1,   3  },
+  { NULL,		          "sptop",     NULL,	0,		     1,          1,			     0,          0,         -1,   4  },
+  { NULL,		          "spcurse",   NULL,	0,		     0,          1,			     0,          0,         -1,   5  },
+  { "discord",        NULL,        NULL,  0,         0,          1,          0,          0,         -1,   6  },
+  { "YouTube Music",  NULL,        NULL,  0,         0,          1,          0,          0,         -1,   7  },
 };
 
 /* layout(s) */
@@ -110,7 +110,7 @@ typedef struct {
   const void *cmd;
 } Sp;
 const char *spcmd1[] = {"st", "-n", "spterm", "-g", "120x34", NULL };
-const char *spcmd2[] = {"st", "-n", "spfm", "-g", "144x41", "-e", "lfrun", NULL };
+const char *spcmd2[] = {"st", "-n", "spfm", "-g", "110x33", "-e", "lfrun", NULL };
 const char *spcmd3[] = {"st", "-n", "spcalcu", "-g", "80x30", "-e", "bc", "-lq", NULL };
 const char *spcmd4[] = {"st", "-n", "spvolume", "-g", "115x20", "-e", "pulsemixer", NULL };
 const char *spcmd5[] = {"st", "-n", "sptop", "-g", "115x35", "-e", "btop", NULL };
