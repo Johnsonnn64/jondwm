@@ -388,12 +388,12 @@ applyrules(Client *c)
 			c->isfloating = r->isfloating;
       c->spnum = r->spnum;
 			c->tags |= r->tags;
+      if (!strcmp(class, "Dragon-drop"))
+        c->isalwaysontop = 1;
 
 			for (m = mons; m && m->num != r->monitor; m = m->next);
 			if (m)
 				c->mon = m;
-    /* if (!strcmp(r->class, "Dragon-drop"))
-    XRaiseWindow(dpy, c->win); */
 		}
 	}
 	if (ch.res_class)
@@ -994,9 +994,9 @@ drawbar(Monitor *m)
   }
 
   for (c = m->clients; c; c = c->next) {
-      occ |= c->tags;
-      if (c->isurgent)
-        urg |= c->tags;
+    occ |= c->tags;
+    if (c->isurgent)
+      urg |= c->tags;
   }
   x = 0;
   for (i = 0; i < LENGTH(tags); i++) {
