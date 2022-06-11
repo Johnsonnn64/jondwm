@@ -2337,8 +2337,11 @@ sigterm(int unused)
 void
 spawn(const Arg *arg)
 {
-	if (arg->v == dmenucmd)
+	if (arg->v == dmenucmd){
 		dmenumon[0] = '0' + selmon->num;
+    int size = selmon->ww - sidepad *2;
+    sprintf(monsize, "%d", size);
+  }
 	if (fork() == 0) {
 		if (dpy)
 			close(ConnectionNumber(dpy));
