@@ -69,8 +69,9 @@ static const Rule rules[] = {
   { NULL,		          "spvol",    NULL,	 0,		      1,          1,			    0,          0,      -1,  3  },
   { NULL,		          "sptop",    NULL,	 0,		      1,          1,			    0,          0,      -1,  4  },
   { NULL,		          "spcurse",  NULL,	 0,		      1,          1,			    0,          0,      -1,  5  },
-  { "discord",        NULL,       NULL,  0,         1,          1,          0,          0,      -1,  6  },
-  { "YouTube Music",  NULL,       NULL,  0,         1,          1,          0,          0,      -1,  7  },
+  { NULL,		          "spnote",   NULL,	 0,		      1,          1,			    0,          0,      -1,  6  },
+  { "discord",        NULL,       NULL,  0,         1,          1,          0,          0,      -1,  7  },
+  { "YouTube Music",  NULL,       NULL,  0,         1,          1,          0,          0,      -1,  8  },
 };
 
 /* layout(s) */
@@ -88,13 +89,13 @@ static const Layout layouts[] = {
 
 /* key definitions */
 #define MODKEY Mod1Mask
-#define TAGKEYS(KEY,TAG) \
-  { MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
-  { MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
-  { MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
-	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} }, \
-	{ MODKEY|Mod4Mask,              KEY,      tagnextmon,     {.ui = 1 << TAG} }, \
-	{ MODKEY|Mod4Mask|ShiftMask,    KEY,      tagprevmon,     {.ui = 1 << TAG} },
+#define TAGKEYS(CHAIN,KEY,TAG) \
+  { MODKEY,                        CHAIN,  KEY,  view,        {.ui = 1 << TAG} }, \
+  { MODKEY|ControlMask,            CHAIN,  KEY,  toggleview,  {.ui = 1 << TAG} }, \
+  { MODKEY|ShiftMask,              CHAIN,  KEY,  tag,         {.ui = 1 << TAG} }, \
+	{ MODKEY|ControlMask|ShiftMask,  CHAIN,  KEY,  toggletag,   {.ui = 1 << TAG} }, \
+	{ MODKEY|Mod4Mask,               CHAIN,  KEY,  tagnextmon,  {.ui = 1 << TAG} }, \
+	{ MODKEY|Mod4Mask|ShiftMask,     CHAIN,  KEY,  tagprevmon,  {.ui = 1 << TAG} },
 
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
@@ -110,12 +111,13 @@ typedef struct {
   const char *name;
   const void *cmd;
 } Sp;
-const char *spcmd1[] = {"st", "-n", "spterm", "-g", "120x34", NULL };
+const char *spcmd1[] = {"st", "-n", "spterm", "-g", "115x34", NULL };
 const char *spcmd2[] = {"st", "-n", "spfm", "-g", "110x33", "-e", "lfrun", NULL };
 const char *spcmd3[] = {"st", "-n", "spcalcu", "-g", "80x30", "-e", "bc", "-lq", NULL };
 const char *spcmd4[] = {"st", "-n", "spvol", "-g", "115x20", "-e", "pulsemixer", NULL };
 const char *spcmd5[] = {"st", "-n", "sptop", "-g", "115x35", "-e", "btop", NULL };
-const char *spcmd6[] = {"st", "-n", "spcurse", "-g", "100x30+1200+5", "-e", "calcurse", NULL };
+const char *spcmd6[] = {"st", "-n", "spcurse", "-g", "100x30", "-e", "calcurse", NULL };
+const char *spcmd7[] = {"st", "-n", "spnote", "-g", "115x34", "-e", "nvim", "-c", "cd ~/personal/org", "/home/john/personal/org/index.org", NULL };
 const char *dcmd[] = {"discord", NULL };
 const char *ytmcmd[] = {"youtube-music", NULL };
 static Sp scratchpads[] = {
@@ -126,78 +128,80 @@ static Sp scratchpads[] = {
   {"spvol",        spcmd4},
   {"sptop",        spcmd5},
   {"spcurse",      spcmd6},
+  {"spnote",       spcmd7},
   {"dcmd",         dcmd},
   {"ytmcmd",       ytmcmd},
 };
 
 #include "movestack.c"
 static Key keys[] = {
-  /* modifier                     key        function        argument */
+  /* modifier                     chain key      key        function        argument */
+  { MODKEY|ShiftMask,             -1,            XK_Return, togglesp,       {.ui = 0 } },
+  { MODKEY,                       XK_s,          XK_f,      togglesp,       {.ui = 1 } },
+  { MODKEY,                       XK_s,          XK_F9,     togglesp,       {.ui = 2 } },
+  { MODKEY|ControlMask,           -1,            XK_v,      togglesp,       {.ui = 3 } },
+  { MODKEY,                       -1,            XK_g,      togglesp,       {.ui = 4 } },
+  { MODKEY|ControlMask,           -1,            XK_c,      togglesp,       {.ui = 5 } },
+  { MODKEY,                       XK_s,          XK_n,      togglesp,       {.ui = 6 } },
+  { MODKEY,                       XK_s,          XK_d,      togglesp,       {.ui = 7 } },
+  { MODKEY,                       XK_s,          XK_y,      togglesp,       {.ui = 8 } },
 
-  { MODKEY,                       XK_grave,  view,           {.ui = ~0 } },
-  { MODKEY|ShiftMask,             XK_grave,  tag,            {.ui = ~0 } },
-  TAGKEYS(                        XK_1,                      0)
-  TAGKEYS(                        XK_2,                      1)
-  TAGKEYS(                        XK_3,                      2)
-  TAGKEYS(                        XK_4,                      3)
-  TAGKEYS(                        XK_8,                      4)
-  TAGKEYS(                        XK_9,                      5)
-  TAGKEYS(                        XK_0,                      6)
+  { MODKEY,                       -1,            XK_grave,  view,           {.ui = ~0 } },
+  { MODKEY|ShiftMask,             -1,            XK_grave,  tag,            {.ui = ~0 } },
+  TAGKEYS(                        -1,            XK_1,                      0)
+  TAGKEYS(                        -1,            XK_2,                      1)
+  TAGKEYS(                        -1,            XK_3,                      2)
+  TAGKEYS(                        -1,            XK_4,                      3)
+  TAGKEYS(                        -1,            XK_8,                      4)
+  TAGKEYS(                        -1,            XK_9,                      5)
+  TAGKEYS(                        -1,            XK_0,                      6)
 
-  { MODKEY,                       XK_Tab,    spawn,          SHCMD("clipmenu -x 15 -z 1890 -l 12") },
-  { MODKEY,                       XK_q,      killclient,     {0} },
-  { MODKEY|ShiftMask,             XK_q,      quit,           {0} },
-  { MODKEY,                       XK_r,      spawn,          {.v = termcmd } },
-  { MODKEY|ShiftMask,             XK_r,      quit,           {1} },
-  { MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
-  { MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
-  { MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
+  { MODKEY,                       -1,            XK_Tab,    spawn,          SHCMD("clipmenu -x 15 -z 1890 -l 12") },
+  { MODKEY,                       -1,            XK_q,      killclient,     {0} },
+  { MODKEY|ShiftMask,             -1,            XK_q,      quit,           {0} },
+  { MODKEY,                       -1,            XK_r,      spawn,          {.v = termcmd } },
+  { MODKEY|ShiftMask,             -1,            XK_r,      quit,           {1} },
+  { MODKEY,                       -1,            XK_t,      setlayout,      {.v = &layouts[0]} },
+  { MODKEY,                       -1,            XK_i,      incnmaster,     {.i = +1 } },
+  { MODKEY,                       -1,            XK_p,      spawn,          {.v = dmenucmd } },
 
-  { MODKEY|ControlMask,           XK_s,      togglesp,       {.ui = 7} },
-  { MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
-  { MODKEY|ControlMask,           XK_d,      togglesp,       {.ui = 6 } },
-	{ MODKEY,                       XK_f,      togglefullscr,  {0} },
-  { MODKEY,                       XK_g,      togglesp,       { .ui = 4 } },
-  { MODKEY,                       XK_h,      setmfact,       {.f = -0.025 } },
-  { MODKEY|ShiftMask,             XK_h,      setcfact,       {.f = -0.25 } },
-  { MODKEY|ShiftMask|ControlMask, XK_h,      moveresize,     {.v = "0x 0y -25w 0h" } },
-  { ControlMask|ShiftMask,        XK_h,      moveresize,     {.v = "-25x 0y 0w 0h" } },
-  { MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
-  { MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } },
-  { MODKEY|ShiftMask|ControlMask, XK_j,      moveresize,     {.v = "0x 0y 0w 25h" } },
-  { ControlMask|ShiftMask,        XK_j,      moveresize,     {.v = "0x 25y 0w 0h" } },
-  { MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
-  { MODKEY|ShiftMask,             XK_k,      movestack,      {.i = -1 } },
-  { MODKEY|ShiftMask|ControlMask, XK_k,      moveresize,     {.v = "0x 0y 0w -25h" } },
-  { ControlMask|ShiftMask,        XK_k,      moveresize,     {.v = "0x -25y 0w 0h" } },
-  { MODKEY,                       XK_l,      setmfact,       {.f = +0.025 } },
-  { MODKEY|ShiftMask,             XK_l,      setcfact,       {.f = +0.25 } },
-  { MODKEY|ShiftMask|ControlMask, XK_l,      moveresize,     {.v = "0x 0y 25w 0h" } },
-  { ControlMask|ShiftMask,        XK_l,      moveresize,     {.v = "25x 0y 0w 0h" } },
-  { MODKEY,                       XK_Return, zoom,           {0} },
-  { MODKEY|ShiftMask,             XK_Return, togglesp,       {.ui = 0 } },
+  { MODKEY,                       -1,            XK_d,      incnmaster,     {.i = -1 } },
+	{ MODKEY,                       -1,            XK_f,      togglefullscr,  {0} },
+  { MODKEY,                       -1,            XK_h,      setmfact,       {.f = -0.025 } },
+  { MODKEY|ShiftMask,             -1,            XK_h,      setcfact,       {.f = -0.25 } },
+  { MODKEY|ShiftMask|ControlMask, -1,            XK_h,      moveresize,     {.v = "0x 0y -25w 0h" } },
+  { ControlMask|ShiftMask,        -1,            XK_h,      moveresize,     {.v = "-25x 0y 0w 0h" } },
+  { MODKEY,                       -1,            XK_j,      focusstack,     {.i = +1 } },
+  { MODKEY|ShiftMask,             -1,            XK_j,      movestack,      {.i = +1 } },
+  { MODKEY|ShiftMask|ControlMask, -1,            XK_j,      moveresize,     {.v = "0x 0y 0w 25h" } },
+  { ControlMask|ShiftMask,        -1,            XK_j,      moveresize,     {.v = "0x 25y 0w 0h" } },
+  { MODKEY,                       -1,            XK_k,      focusstack,     {.i = -1 } },
+  { MODKEY|ShiftMask,             -1,            XK_k,      movestack,      {.i = -1 } },
+  { MODKEY|ShiftMask|ControlMask, -1,            XK_k,      moveresize,     {.v = "0x 0y 0w -25h" } },
+  { ControlMask|ShiftMask,        -1,            XK_k,      moveresize,     {.v = "0x -25y 0w 0h" } },
+  { MODKEY,                       -1,            XK_l,      setmfact,       {.f = +0.025 } },
+  { MODKEY|ShiftMask,             -1,            XK_l,      setcfact,       {.f = +0.25 } },
+  { MODKEY|ShiftMask|ControlMask, -1,            XK_l,      moveresize,     {.v = "0x 0y 25w 0h" } },
+  { ControlMask|ShiftMask,        -1,            XK_l,      moveresize,     {.v = "25x 0y 0w 0h" } },
+  { MODKEY,                       -1,            XK_Return, zoom,           {0} },
 
-  { MODKEY|ControlMask,           XK_c,      togglesp,       {.ui = 5} },
-  { MODKEY|ControlMask,           XK_v,      togglesp,       {.ui = 3} },
-  { MODKEY,                       XK_b,      togglebar,      {0} },
-  { MODKEY|ControlMask,           XK_b,      spawn,          SHCMD("bluetoothdmenu.sh") },
-  { MODKEY,                       XK_n,      togglesp,       {.ui = 1} },
-  { MODKEY,                       XK_m,      setlayout,      {.v = &layouts[1]} },
-  { MODKEY|ShiftMask,             XK_m,      movecenter,     {0} },
-  { MODKEY,                       XK_comma,  focusmonx,      {.i = 0 } },
-  { MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
-  { MODKEY,                       XK_period, focusmonx,      {.i = 1 } },
-  { MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-  { MODKEY,                       XK_space,  spawn,          SHCMD("dunstctl close-all") },
-  { MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
+  { MODKEY,                       -1,            XK_b,      togglebar,      {0} },
+  { MODKEY|ControlMask,           -1,            XK_b,      spawn,          SHCMD("bluetoothdmenu.sh") },
+  // { MODKEY,                       -1,            XK_m,      setlayout,      {.v = &layouts[1]} },
+  { MODKEY|ShiftMask,             -1,            XK_m,      movecenter,     {0} },
+  { MODKEY,                       -1,            XK_comma,  focusmonx,      {.i = 0 } },
+  { MODKEY|ShiftMask,             -1,            XK_comma,  tagmon,         {.i = -1 } },
+  { MODKEY,                       -1,            XK_period, focusmonx,      {.i = 1 } },
+  { MODKEY|ShiftMask,             -1,            XK_period, tagmon,         {.i = +1 } },
+  { MODKEY,                       -1,            XK_space,  spawn,          SHCMD("dunstctl close-all") },
+  { MODKEY|ShiftMask,             -1,            XK_space,  togglefloating, {0} },
 
-  { MODKEY,                       XK_F5,     spawn,          SHCMD("sudo xbacklight -dec 5") },
-  { MODKEY,                       XK_F6,     spawn,          SHCMD("sudo xbacklight -inc 5") },
-  { MODKEY,                       XK_F7,     spawn,          SHCMD("dmenuumount.sh") },
-  { MODKEY,                       XK_F8,     spawn,          SHCMD("dmenumount.sh") },
-  { MODKEY,                       XK_F9,     togglesp,       {.ui = 2 } },
-  { MODKEY,                       XK_F10,    spawn,          SHCMD("playerctl play-pause") },
-  { 0,                            XK_Print,  spawn,          {.v = sscmd } },
+  { MODKEY,                       -1,            XK_F5,     spawn,          SHCMD("sudo xbacklight -dec 5") },
+  { MODKEY,                       -1,            XK_F6,     spawn,          SHCMD("sudo xbacklight -inc 5") },
+  { MODKEY,                       -1,            XK_F7,     spawn,          SHCMD("dmenuumount.sh") },
+  { MODKEY,                       -1,            XK_F8,     spawn,          SHCMD("dmenumount.sh") },
+  { MODKEY,                       -1,            XK_F10,    spawn,          SHCMD("playerctl play-pause") },
+  { 0,                            -1,            XK_Print,  spawn,          {.v = sscmd } },
 
   // test
   /* {MODKEY, 						XK_w, 	   hideotherwins,  {0}},
