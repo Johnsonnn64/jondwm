@@ -68,18 +68,11 @@ wlan() {
 }
 
 clock() {
-	printf "^c$blue^󱑆"
-  printf "^c$blue^ $(date '+%a, %m-%d ')"
-	printf "^c$blue^ $(date '+%H:%M')  "
+	printf " "
+  printf " $(date '+%a, %m-%d ')"
+  printf " 󱑆"
+	printf " $(date '+%H:%M')"
 }
-
-obake() {
-  printf "^c$red^ 󰊠 "
-  printf "^c$yellow^ 󰊠 "
-  printf "^c$blue^ 󰊠 "
-  printf "^c$purple^ 󰊠"
-}
-obake=$(obake)
 
 # weat() {
 # 	curl -sf "wttr.in/angeles" > ~/.cache/wttr
@@ -94,5 +87,5 @@ while true; do
 	# [ $interval = 0 ] || [ $(($interval % 3600)) = 0 ] # && updates=$(pkg_updates)
 	interval=$((interval + 1))
 
-  sleep 1 && xsetroot -name "$(echo "$(wlan)  $(mem)  $(battery) $(brightness)  $(clock)   $obake " | sed 's/   */  /g' | sed 's/   */  /g')"
+  sleep 1 && xsetroot -name "$(echo "$(wlan)  $(mem)  $(battery) $(brightness) ; $(clock)" | sed 's/   */  /g')"
 done
