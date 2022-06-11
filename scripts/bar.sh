@@ -33,13 +33,13 @@ battery() {
     get_capacity="$(cat /sys/class/power_supply/BAT0/capacity)"
     ac_state="$(cat /sys/class/power_supply/AC/online)"
 
-    if [ "$ac_state" == 1 ]; then
-      printf "^c$green^   $get_capacity"
+    if [ "$ac_state" -eq 1 ]; then
+      printf "^c$green^  $get_capacity"
     else
       if [ "$get_capacity" -le 20 ]; then
-        printf "^c$red^   $get_capacity"
+        printf "^c$red^  $get_capacity"
       else
-        printf "^c$yellow^   $get_capacity"
+        printf "^c$yellow^  $get_capacity"
       fi
     fi
   fi
@@ -59,13 +59,12 @@ mem() {
 }
 
 wlan() {
-  state=$(for s in /sys/class/net/* ; do 
-    echo $s $(cat "$s/operstate")
-  done | grep up | awk '{print $2}')
-  case "$state" in
-    up) printf "^c$blue^  󰤨 ^d^%s" " ^c$blue^Connected" ;;
-    down) printf "^c$red^  󰤭 ^d^%s" " ^c$red^Disconnected" ;;
-  esac
+  state=$(cat /sys/class/net/*/operstate | grep up)
+  if [ -z "$state" ]; then 
+    printf "^c$red^  󰤭 ^d^%s" " ^c$red^Disconnected"
+  else
+    printf "^c$blue^  󰤨 ^d^%s" " ^c$blue^Connected"
+  fi
 }
 
 clock() {
