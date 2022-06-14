@@ -61,9 +61,9 @@ mem() {
 wlan() {
   state=$(cat /sys/class/net/*/operstate | grep up)
   if [ -z "$state" ]; then 
-    printf "^c$red^  󰤭 ^d^%s" " ^c$red^Disconnected"
+    printf "^c$red^ 󰤭^d^%s" " ^c$red^Disconnected"
   else
-    printf "^c$blue^  󰤨 ^d^%s" " ^c$blue^Connected"
+    printf "^c$blue^ 󰤨^d^%s" " ^c$blue^Connected"
   fi
 }
 
@@ -87,5 +87,5 @@ while true; do
 	# [ $interval = 0 ] || [ $(($interval % 3600)) = 0 ] # && updates=$(pkg_updates)
 	interval=$((interval + 1))
 
-  sleep 1 && xsetroot -name "$(echo "$(wlan)  $(mem)  $(battery) $(brightness) ; $(clock)" | sed 's/   */  /g')"
+  sleep 1 && xsetroot -name "$(echo "$(wlan) $(mem)  $(battery) $(brightness) ; $(clock)" | sed 's/   */  /g')"
 done
