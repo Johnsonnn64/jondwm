@@ -112,13 +112,13 @@ typedef struct {
   const char *name;
   const void *cmd;
 } Sp;
-const char *spcmd1[] = {"st", "-n", "spterm", "-g", "115x34", NULL };
+const char *spcmd1[] = {"st", "-n", "spterm", "-g", "125x34", NULL };
 const char *spcmd2[] = {"st", "-n", "spfm", "-g", "110x33", "-e", "lfrun", NULL };
 const char *spcmd3[] = {"st", "-n", "spcalcu", "-g", "80x30", "-e", "bc", "-lq", NULL };
-const char *spcmd4[] = {"st", "-n", "spvol", "-g", "115x20", "-e", "pulsemixer", NULL };
+const char *spcmd4[] = {"st", "-n", "spvol", "-g", "100x15", "-e", "pulsemixer", NULL };
 const char *spcmd5[] = {"st", "-n", "sptop", "-g", "115x35", "-e", "btop", NULL };
 const char *spcmd6[] = {"st", "-n", "spcurse", "-g", "100x30", "-e", "calcurse", NULL };
-const char *spcmd7[] = {"st", "-n", "spnote", "-g", "115x34", "-e", "nvim", "-c", "cd ~/personal/org", "/home/john/personal/org/index.org", NULL };
+const char *spcmd7[] = {"st", "-n", "spnote", "-g", "125x34", "-e", "nvim", "-c", "cd ~/personal/org", "/home/john/personal/org/index.org", NULL };
 const char *dcmd[] = {"discord", NULL };
 const char *ytmcmd[] = {"youtube-music", NULL };
 static Sp scratchpads[] = {
