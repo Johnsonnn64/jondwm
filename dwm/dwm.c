@@ -794,7 +794,7 @@ createmon(void)
 	m = ecalloc(1, sizeof(Monitor));
 	m->tagset[0] = m->tagset[1] = 1;
 	m->mfact = mfact;
-	// m->nmaster = nmaster;
+	m->nmaster = nmaster;
 	m->showbar = showbar;
 	m->topbar = topbar;
 	m->gappih = gappih;
@@ -2461,10 +2461,8 @@ tile(Monitor *m)
 	int mrest, srest;
 	Client *c;
 
-  // for (m = mons; m; m = m->next) {
-    if (m->ww > m->wh)
-      m->nmaster = 1;
-  // }
+  if (m->ww < m->wh)
+    m->nmaster = 0;
 
 	getgaps(m, &oh, &ov, &ih, &iv, &n);
 	if (n == 0)
