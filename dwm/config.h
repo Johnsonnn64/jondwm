@@ -58,6 +58,7 @@ static const Rule rules[] = {
     WM_NAME(STRING) = title*/
   /* class            instance    title  tags mask  iscentered  isfloating  isterminal  noswal  mon  spnum*/
   { "St",             NULL,       NULL,  0,         0,          0,          1,          0,      -1,  -1 },
+  { "Alacritty",      NULL,       NULL,  0,         0,          0,          1,          0,      -1,  -1 },
   { "zoom",           NULL,       NULL,  1 << 6,    1,          1,          0,          0,      -1,  -1 },
   { "Dragon-drop",    NULL,       NULL,  ~0,        1,          1,          0,          1,      -1,  -1 },
   { NULL,             "fcen",     NULL,  0,         1,          1,          0,          1,      -1,  -1 },
@@ -105,22 +106,36 @@ static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() 
 static char monsize[1890];
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-x", "15", "-y", "15", "-z", monsize, NULL };
 static const char *clipcmd[] = { "clipmenu", "-m", dmenumon, "-x", "15", "-y", "15", "-z", monsize, NULL };
-static const char *termcmd[]  = { "st", NULL };
+static const char *termcmd[]  = { "alacritty", NULL };
 static const char *sscmd[] = { "scrot", "-F", "screenshot.png", "-o", "-s", "-f", "-e", "mv screenshot.png ~/personal/pictures/ && xclip -selection clipboard -target image/png -i ~/personal/pictures/screenshot.png", NULL};
 
 typedef struct {
   const char *name;
   const void *cmd;
 } Sp;
-const char *spcmd1[] = {"st", "-n", "spterm", "-g", "125x34", NULL };
+
+/* st cmds */
+/* const char *spcmd1[] = {"st", "-n", "spterm", "-g", "125x34", NULL };
 const char *spcmd2[] = {"st", "-n", "spfm", "-g", "110x33", "-e", "lfrun", NULL };
 const char *spcmd3[] = {"st", "-n", "spcalcu", "-g", "80x30", "-e", "bc", "-lq", NULL };
 const char *spcmd4[] = {"st", "-n", "spvol", "-g", "100x15", "-e", "pulsemixer", NULL };
 const char *spcmd5[] = {"st", "-n", "sptop", "-g", "115x35", "-e", "btop", NULL };
 const char *spcmd6[] = {"st", "-n", "spcurse", "-g", "100x30", "-e", "calcurse", NULL };
-const char *spcmd7[] = {"st", "-n", "spnote", "-g", "125x34", "-e", "nvim", "+3", "-c", "cd ~/personal/org", "/home/john/personal/org/index.org", NULL };
-const char *dcmd[] = {"discord", NULL };
+const char *spcmd7[] = {"st", "-n", "spnote", "-g", "125x34", "-e", "nvim", "+3", "-c", "cd ~/personal/org", "/home/john/personal/org/index.org", NULL }; */
+
+/* alacritty cmd */
+const char *spcmd1[] = {"alacritty", "--class=spterm", "-o", "window.dimensions.columns=125", "window.dimensions.lines=34", NULL };
+const char *spcmd2[] = {"alacritty", "--class=spfm", "-o", "window.dimensions.columns=110", "window.dimensions.lines=33", "-e", "lfrun", NULL };
+const char *spcmd3[] = {"alacritty", "--class=spcalcu", "-o", "window.dimensions.columns=80", "window.dimensions.lines=30", "-e", "bc", "-lq", NULL };
+const char *spcmd4[] = {"alacritty", "--class=spvol", "-o", "window.dimensions.columns=100", "window.dimensions.lines=15", "-e", "pulsemixer", NULL };
+const char *spcmd5[] = {"alacritty", "--class=sptop", "-o", "window.dimensions.columns=115", "window.dimensions.lines=35", "-e", "btop", NULL };
+const char *spcmd6[] = {"alacritty", "--class=spcurse" "-o", "window.dimensions.columns=100", "window.dimensions.lines=30", "-e", "calcurse", NULL };
+const char *spcmd7[] = {"alacritty", "--class=spnote", "-o", "window.dimensions.columns=125", "window.dimensions.lines=34", "-e", "nvim", "+3", "-c", "cd ~/personal/org", "/home/john/personal/org/index.org", NULL };
+
+const char *dcmd[] = {"discocss", NULL };
 const char *ytmcmd[] = {"youtube-music", NULL };
+
+
 static Sp scratchpads[] = {
   /* name          cmd  */
   {"spterm",       spcmd1},
