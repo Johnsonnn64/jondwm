@@ -808,7 +808,7 @@ createmon(void)
 	m->pertag->curtag = m->pertag->prevtag = 1;
 
 	for (i = 0; i <= LENGTH(tags); i++) {
-		m->pertag->nmasters[i] = m->nmaster;
+    m->pertag->nmasters[i] = m->nmaster;
 		m->pertag->mfacts[i] = m->mfact;
 
 		m->pertag->ltidxs[i][0] = m->lt[0];
@@ -1860,7 +1860,7 @@ tagnextmon(const Arg *arg)
 void
 tagprevmon(const Arg *arg)
 {
-tagothermon(arg, -1);
+  tagothermon(arg, -1);
 }
 
 void
@@ -2489,7 +2489,7 @@ tile(Monitor *m)
 	int mrest, srest;
 	Client *c;
 
-  if (m->ww < m->wh)
+  if (m->ww < m->wh) // better layout for vertical monitors
     m->nmaster = 0;
 
 	getgaps(m, &oh, &ov, &ih, &iv, &n);
