@@ -34,7 +34,7 @@ battery() {
     ac_state="$(cat /sys/class/power_supply/AC/online)"
 
     if [ "$ac_state" -eq 1 ]; then
-      printf "^c$green^  $get_capacity"
+      printf "^c$green^ $get_capacity"
     else
       if [ "$get_capacity" -le 20 ]; then
         printf "^c$red^  $get_capacity"
@@ -68,24 +68,16 @@ wlan() {
 }
 
 clock() {
-	printf " "
+	printf "^c$blue^ "
   printf " $(date '+%a, %m-%d ')"
   printf " 󱑆"
 	printf " $(date '+%H:%M')"
 }
-
-# weat() {
-# 	curl -sf "wttr.in/angeles" > ~/.cache/wttr
-# 	weatreport=~/.cache/wttr
-# 	wstatus=$(sed '3q;d' $weatreport | sed 's/^.*.0m  *//g' )
-# 	degree=$(sed '4q;d' $weatreport | grep -o "m\\([-+]\\)*[0-9]\\+" | tr '\n|m' ' ' | awk '{print $1,"°(",$2,"°)"}' | sed 's/ //g')
-# 	printf "^c$blue^ $wstatus $degree"
-# }
 
 while true; do
 
 	# [ $interval = 0 ] || [ $(($interval % 3600)) = 0 ] # && updates=$(pkg_updates)
 	interval=$((interval + 1))
 
-  sleep 1 && xsetroot -name "$(echo "$(wlan) $(mem)  $(battery) $(brightness) ; $(clock)" | sed 's/   */  /g')"
+  sleep 1 && xsetroot -name "$(echo "$(wlan) $(mem)  $(battery) $(brightness)  $(clock)  " | sed 's/   */  /g')"
 done
