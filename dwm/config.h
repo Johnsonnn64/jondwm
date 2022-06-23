@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx     = 0;    /* border pixel of windows */
+static const unsigned int borderpx     = 1;    /* border pixel of windows */
 static const unsigned int snap         = 32;   /* snap pixel */
 static const int showbar               = 1;    /* 0 means no bar */
 static const int topbar                = 1;    /* 0 means bottom bar */
@@ -15,7 +15,8 @@ static const int user_bh               = 30;   /* user assigned bar height */
 static const int vertpad               = 15;   /* statusbar verical padding */
 static const int sidepad               = 15;   /* statusbar side padding */
 static const unsigned int colorfultag  = 1;    /* 0 means use SchemeSel for selected tag */
-static const char *fonts[]             = { "JetBrainsMono Nerd Font:style=Medium:size=10:antialias=true",
+// static const char *fonts[]             = { "JetBrainsMono Nerd Font:style=Medium:size=10:antialias=true",
+static const char *fonts[]             = { "Iosevka Nerd Font:style=Medium:size=10:antialias=true",
                                            "Material Design Icons-Regular:size=10:antialias=true", };
 
 #include "catppuccin.h"
@@ -49,7 +50,7 @@ static char *tags[] = {"󰮯", "󰧞", "󰑊", "󰧞", "󰑊", "󰧞", "󰑊"};
 
 static const unsigned int ulinepad      = 5;    /* horizontal padding between the underline and tag */
 static const unsigned int ulinestroke   = 2;    /* thickness / height of the underline */
-static const unsigned int ulinevoffset  = 4;    /* how far above the bottom of the bar the line should appear */
+static const unsigned int ulinevoffset  = 2;    /* how far above the bottom of the bar the line should appear */
 static const int ulineall               = 0;    /* 1 to show underline on all tags, 0 for just the active ones */
 
 static const Rule rules[] = {
@@ -83,7 +84,7 @@ static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen win
 
 static const Layout layouts[] = {
   /* symbol     arrange function */
-  { "󰊠",      tile },    /* first entry is default */
+  { "󰊠",        tile },    /* first entry is default */
   { "|M|",      centeredmaster },
   { "><>",      NULL },    /* no layout function means floating behavior */
 };
