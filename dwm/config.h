@@ -11,7 +11,7 @@ static const unsigned int gappiv       = 15;   /* vert inner gap between windows
 static const unsigned int gappoh       = 15;   /* horiz outer gap between windows and screen edge */
 static const unsigned int gappov       = 15;   /* vert outer gap between windows and screen edge */
 static const int smartgaps             = 0;    /* 1 means no outer gap when there is only one window */
-static const int user_bh               = 30;   /* user assigned bar height */
+static const int user_bh               = 28;   /* user assigned bar height */
 static const int vertpad               = 15;   /* statusbar verical padding */
 static const int sidepad               = 15;   /* statusbar side padding */
 static const unsigned int colorfultag  = 1;    /* 0 means use SchemeSel for selected tag */
@@ -58,7 +58,7 @@ static const Rule rules[] = {
     WM_CLASS(STRING) = instance, class
     WM_NAME(STRING) = title*/
   /* class            instance    title  tags mask  iscentered  isfloating  isterminal  noswal  mon  spnum*/
-  { "st-256color",             NULL,       NULL,  0,         0,          0,          1,          0,      -1,  -1 },
+  { "st-256color",    NULL,       NULL,  0,         0,          0,          1,          0,      -1,  -1 },
   { "Alacritty",      NULL,       NULL,  0,         0,          0,          1,          0,      -1,  -1 },
   { "zoom",           NULL,       NULL,  1 << 6,    1,          1,          0,          0,      -1,  -1 },
   { "Dragon-drop",    NULL,       NULL,  ~0,        1,          1,          0,          1,      -1,  -1 },
@@ -79,7 +79,7 @@ static const Rule rules[] = {
 /* layout(s) */
 static const float mfact = 0.50; /* factor of master area size [0.05..0.95] */
 static const int nmaster = 1;    /* number of clients in master area */
-static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
+static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
 
 static const Layout layouts[] = {
