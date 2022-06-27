@@ -1,5 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
+#include <X11/XF86keysym.h>
+
 /* appearance */
 static const unsigned int borderpx     = 0;    /* border pixel of windows */
 static const unsigned int snap         = 32;   /* snap pixel */
@@ -62,6 +64,7 @@ static const Rule rules[] = {
   { "Alacritty",      NULL,       NULL,  0,         0,          0,          1,          0,      -1,  -1 },
   { "zoom",           NULL,       NULL,  1 << 6,    1,          1,          0,          0,      -1,  -1 },
   { "Dragon-drop",    NULL,       NULL,  ~0,        1,          1,          0,          1,      -1,  -1 },
+  { NULL,             NULL,       "Event Tester",  0,        0,          0,          0,          1,      -1,  -1 },
   { NULL,             "fcen",     NULL,  0,         1,          1,          0,          1,      -1,  -1 },
   { NULL,             "fl",       NULL,  0,         0,          1,          0,          1,      -1,  -1 },
   /* scratchpads*/
@@ -185,7 +188,7 @@ static Key keys[] = {
   { MODKEY,                       -1,            XK_d,      incnmaster,     {.i = -1 } },
 	{ MODKEY,                       -1,            XK_f,      togglefullscr,  {0} },
   { MODKEY,                       -1,            XK_h,      setmfact,       {.f = -0.025 } },
-  { MODKEY|ShiftMask,             -1,            XK_h,      setcfact,       {.f = -0.25 } },
+  { MODKEY|ShiftMask,             -1,            XK_h,      setcfact,       {.f = -0.20 } },
   { MODKEY|ShiftMask|ControlMask, -1,            XK_h,      moveresize,     {.v = "0x 0y -25w 0h" } },
   { ControlMask|ShiftMask,        -1,            XK_h,      moveresize,     {.v = "-25x 0y 0w 0h" } },
   { MODKEY,                       -1,            XK_j,      focusstack,     {.i = +1 } },
@@ -197,7 +200,7 @@ static Key keys[] = {
   { MODKEY|ShiftMask|ControlMask, -1,            XK_k,      moveresize,     {.v = "0x 0y 0w -25h" } },
   { ControlMask|ShiftMask,        -1,            XK_k,      moveresize,     {.v = "0x -25y 0w 0h" } },
   { MODKEY,                       -1,            XK_l,      setmfact,       {.f = +0.025 } },
-  { MODKEY|ShiftMask,             -1,            XK_l,      setcfact,       {.f = +0.25 } },
+  { MODKEY|ShiftMask,             -1,            XK_l,      setcfact,       {.f = +0.20 } },
   { MODKEY|ShiftMask|ControlMask, -1,            XK_l,      moveresize,     {.v = "0x 0y 25w 0h" } },
   { ControlMask|ShiftMask,        -1,            XK_l,      moveresize,     {.v = "25x 0y 0w 0h" } },
   { MODKEY,                       -1,            XK_Return, zoom,           {0} },
@@ -219,6 +222,8 @@ static Key keys[] = {
   { MODKEY,                       -1,            XK_F8,     spawn,          SHCMD("dmenumount.sh") },
   { MODKEY,                       -1,            XK_F10,    spawn,          SHCMD("playerctl play-pause") },
   { 0,                            -1,            XK_Print,  spawn,          {.v = sscmd } },
+  { 0,                            -1,            XF86XK_AudioPlay, spawn,   SHCMD("playerctl play-pause") },
+  { 0,                            -1,            XF86XK_AudioNext, spawn,   SHCMD("playerctl next") },
 
   // test
   /* {MODKEY, 						XK_w, 	   hideotherwins,  {0}},
