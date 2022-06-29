@@ -3,7 +3,7 @@
 #include <X11/XF86keysym.h>
 
 /* appearance */
-static const unsigned int borderpx     = 0;    /* border pixel of windows */
+static const unsigned int borderpx     = 1;    /* border pixel of windows */
 static const unsigned int snap         = 32;   /* snap pixel */
 static const int showbar               = 1;    /* 0 means no bar */
 static const int topbar                = 1;    /* 0 means bottom bar */
@@ -16,6 +16,7 @@ static const int smartgaps             = 0;    /* 1 means no outer gap when ther
 static const int user_bh               = 28;   /* user assigned bar height */
 static const int vertpad               = 15;   /* statusbar verical padding */
 static const int sidepad               = 15;   /* statusbar side padding */
+static const int focusonwheel          = 0;    /* click on focus with mousewheel */
 static const unsigned int colorfultag  = 1;    /* 0 means use SchemeSel for selected tag */
 static const char *fonts[]             = { "JetBrainsMono Nerd Font:style=Medium:size=9:antialias=true",
 // static const char *fonts[]             = { "Iosevka Nerd Font:style=Medium:size=10:antialias=true",
@@ -153,6 +154,7 @@ static Sp scratchpads[] = {
   {"ytmcmd",       ytmcmd},
 };
 
+/* keybindings */
 #include "movestack.c"
 static Key keys[] = {
   /* modifier                     chain key      key        function        argument */
