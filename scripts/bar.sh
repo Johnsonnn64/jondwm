@@ -38,6 +38,7 @@ battery() {
     else
       if [ "$get_capacity" -le 20 ]; then
         printf "^c$red^  $get_capacity"
+        notify-send -u critical "Low Battery!" "Please Charge"
       else
         printf "^c$yellow^  $get_capacity"
       fi
