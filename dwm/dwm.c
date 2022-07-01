@@ -1024,7 +1024,7 @@ void
 drawbar(Monitor *m)
 {
   int x, w, tw = 0;
-  int bh_n = bh - borderpx * 2;
+  int bh_n = bh;
   unsigned int i, occ = 0, urg = 0;
   Client *c;
 
