@@ -125,6 +125,13 @@ typedef struct {
 	void (*arrange)(Monitor *);
 } Layout;
 
+typedef struct {
+	int mw, mh;    /* >= matching */
+	int layout;    /* only apply if this is the current layout, <0 for no matching */
+	int nmaster;   /* the new nmaster to apply */
+	float mfact;   /* the new mfact to apply */
+} LayoutMonitorRule;
+
 typedef struct Pertag Pertag;
 struct Monitor {
 	char ltsymbol[16];
@@ -167,6 +174,7 @@ typedef struct {
 } Rule;
 
 /* function declarations */
+static void applylmrules(void);
 static void applyrules(Client *c);
 static int applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact);
 static void arrange(Monitor *m);
@@ -357,6 +365,39 @@ struct Pertag {
 struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
 
 /* function implementations */
+void
+applylmrules(void)
+{
+	size_t t;
+
+	for (t = 0; t <= LENGTH(tags); t++) {
+		float new_mfact = mfact;
+		int new_nmaster = nmaster;
+		size_t i;
+
+		for (i = 0; i < LENGTH(lm_rules); i++) {
+			const LayoutMonitorRule *lmr = &lm_rules[i];
+
+			if (selmon->mw >= lmr->mw &&
+			    selmon->mh >= lmr->mh &&
+			    selmon->lt[selmon->pertag->sellts[t]] == &layouts[lmr->layout])
+			{
+				new_mfact = lmr->mfact;
+				new_nmaster = lmr->nmaster;
+				break;
+			}
+		}
+
+		selmon->pertag->mfacts[t] = new_mfact;
+		selmon->pertag->nmasters[t] = new_nmaster;
+
+	}
+
+	selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
+	selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
+	arrange(selmon);
+}
+
 void
 applyrules(Client *c)
 {
@@ -725,6 +766,7 @@ configurenotify(XEvent *e)
 			}
 			focus(NULL);
 			arrange(NULL);
+			applylmrules();
 		}
 	}
 }
@@ -2050,9 +2092,8 @@ setlayout(const Arg *arg)
 	if (arg && arg->v)
 		selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt] = (Layout *)arg->v;
 	strncpy(selmon->ltsymbol, selmon->lt[selmon->sellt]->symbol, sizeof selmon->ltsymbol);
-	if (selmon->sel)
-		arrange(selmon);
-	else
+	applylmrules();
+	if (!selmon->sel)
 		drawbar(selmon);
 }
 
@@ -2250,6 +2291,7 @@ setup(void)
 	XSelectInput(dpy, root, wa.event_mask);
 	grabkeys();
 	focus(NULL);
+	applylmrules();
 }
 
 
@@ -2449,9 +2491,6 @@ tile(Monitor *m)
 	float mfacts, sfacts;
 	int mrest, srest;
 	Client *c;
-
-  if (m->ww < m->wh) // better layout for vertical monitors
-    m->nmaster = 0;
 
 	getgaps(m, &oh, &ov, &ih, &iv, &n);
 	if (n == 0)
