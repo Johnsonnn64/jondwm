@@ -1,5 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 
+#include <X11/X.h>
 #include <X11/XF86keysym.h>
 
 /* appearance */
@@ -60,25 +61,29 @@ static const Rule rules[] = {
   /*xprop(1):
     WM_CLASS(STRING) = instance, class
     WM_NAME(STRING) = title*/
-  /* class            instance    title  tags mask  iscentered  isfloating  isterminal  noswal  mon  spnum*/
-  { "st-256color",    NULL,       NULL,  0,         0,          0,          1,          0,      -1,  -1 },
-  { "Alacritty",      NULL,       NULL,  0,         0,          0,          1,          0,      -1,  -1 },
-  { "zoom",           NULL,       NULL,  1 << 6,    1,          1,          0,          0,      -1,  -1 },
-  { "Dragon-drop",    NULL,       NULL,  ~0,        1,          1,          0,          1,      -1,  -1 },
-  { NULL,             NULL,       "Event Tester",  0,        0,          0,          0,          1,      -1,  -1 },
-  { NULL,             "fcen",     NULL,  0,         1,          1,          0,          1,      -1,  -1 },
-  { NULL,             "fl",       NULL,  0,         0,          1,          0,          1,      -1,  -1 },
+  /* class            instance    title            tags  centered  floating  terminal  noswal  mon  spnum*/
+  { "st-256color",    NULL,       NULL,            0,    0,        0,        1,        0,      -1,  -1 },
+  { "Alacritty",      NULL,       NULL,            0,    0,        0,        1,        0,      -1,  -1 },
+  { "Dragon-drop",    NULL,       NULL,            ~0,   1,        1,        0,        1,      -1,  -1 },
+  { NULL,             NULL,       "Event Tester",  0,    0,        0,        0,        1,      -1,  -1 },
+  { NULL,             "fcen",     NULL,            0,    1,        1,        0,        1,      -1,  -1 },
+  { NULL,             "fl",       NULL,            0,    0,        1,        0,        1,      -1,  -1 },
   /* scratchpads*/
-  { NULL,		          "spterm",	 	NULL,	 0,		      1,          1,			    1,          0,      -1,  0  },
-  { NULL,		          "spfm",	   	NULL,	 0,		      1,          1,			    1,          0,      -1,  1  },
-  { NULL,		          "spcalcu",  NULL,	 0,		      1,          1,			    0,          0,      -1,  2  },
-  { NULL,		          "spvol",    NULL,	 0,		      1,          1,			    0,          0,      -1,  3  },
-  { NULL,		          "sptop",    NULL,	 0,		      1,          1,			    0,          0,      -1,  4  },
-  { NULL,		          "spcurse",  NULL,	 0,		      1,          1,			    0,          0,      -1,  5  },
-  { NULL,		          "spnote",   NULL,	 0,		      1,          1,			    0,          0,      -1,  6  },
-  { "discord",        NULL,       NULL,  0,         1,          1,          0,          0,      -1,  7  },
-  { "YouTube Music",  NULL,       NULL,  0,         1,          1,          0,          0,      -1,  8  },
+  { NULL,		          "spterm",	 	NULL,	           0,		 1,        1,			   1,        0,      -1,  0  },
+  { NULL,		          "spfm",	   	NULL,	           0,		 1,        1,			   1,        0,      -1,  1  },
+  { NULL,		          "spcalcu",  NULL,	           0,		 1,        1,			   0,        0,      -1,  2  },
+  { NULL,		          "spvol",    NULL,	           0,		 1,        1,			   0,        0,      -1,  3  },
+  { NULL,		          "sptop",    NULL,	           0,		 1,        1,			   0,        0,      -1,  4  },
+  { NULL,		          "spnote",   NULL,	           0,		 1,        1,			   0,        0,      -1,  5  },
+  { "discord",        NULL,       NULL,            0,    1,        1,        0,        0,      -1,  6  },
+  { "YouTube Music",  NULL,       NULL,            0,    1,        1,        0,        0,      -1,  7  },
 };
+
+static const LayoutMonitorRule lm_rules[] = {
+ 	/* >=w, >=h,   req'd layout, new nmaster, new mfact */
+  {  0,   1500,  0,            0,           0.50 },
+};
+
 
 /* layout(s) */
 static const float mfact = 0.50; /* factor of master area size [0.05..0.95] */
@@ -111,8 +116,8 @@ static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() 
 static char monsize[1890];
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-x", "15", "-y", "15", "-z", monsize, NULL };
 static const char *clipcmd[] = { "clipmenu", "-m", dmenumon, "-x", "15", "-y", "15", "-z", monsize, NULL };
+static const char *passcmd[] = { "passmenu", "-m", dmenumon, "-x", "15", "-y", "15", "-z", monsize, NULL };
 static const char *termcmd[]  = { "st", NULL };
-static const char *sscmd[] = { "scrot", "-F", "screenshot.png", "-o", "-s", "-f", "-e", "mv screenshot.png ~/personal/pictures/ && xclip -selection clipboard -target image/png -i ~/personal/pictures/screenshot.png", NULL};
 
 typedef struct {
   const char *name;
@@ -120,13 +125,12 @@ typedef struct {
 } Sp;
 
 /* st cmds */
-const char *spcmd1[] = {"st", "-n", "spterm", "-g", "125x34", NULL };
-const char *spcmd2[] = {"st", "-n", "spfm", "-g", "110x33", "-e", "lfrun", NULL };
-const char *spcmd3[] = {"st", "-n", "spcalcu", "-g", "80x30", "-e", "bc", "-lq", NULL };
-const char *spcmd4[] = {"st", "-n", "spvol", "-g", "100x15", "-e", "pulsemixer", NULL };
-const char *spcmd5[] = {"st", "-n", "sptop", "-g", "115x35", "-e", "btop", NULL };
-const char *spcmd6[] = {"st", "-n", "spcurse", "-g", "100x30", "-e", "calcurse", NULL };
-const char *spcmd7[] = {"st", "-n", "spnote", "-g", "125x34", "-e", "nvim", "+3", "-c", "cd ~/personal/org", "/home/john/personal/org/index.org", NULL };
+const char *spterm[] = {"st", "-n", "spterm", "-g", "125x34", NULL };
+const char *spfm[] = {"st", "-n", "spfm", "-g", "110x33", "-e", "lfrun", NULL };
+const char *spbc[] = {"st", "-n", "spcalcu", "-g", "80x30", "-e", "bc", "-lq", NULL };
+const char *sppm[] = {"st", "-n", "spvol", "-g", "100x15", "-e", "pulsemixer", NULL };
+const char *sptop[] = {"st", "-n", "sptop", "-g", "115x35", "-e", "btop", NULL };
+const char *sporg[] = {"st", "-n", "spnote", "-g", "125x34", "-e", "nvim", "-c :call cursor(3,3)", "-c cd ~/personal/org", "/home/john/personal/org/index.org", NULL };
 
 /* alacritty cmd */
 /* const char *spcmd1[] = {"alacritty", "--class=spterm", "-o", "window.dimensions.columns=125", "window.dimensions.lines=34", NULL };
@@ -143,18 +147,17 @@ const char *ytmcmd[] = {"youtube-music", NULL };
 
 static Sp scratchpads[] = {
   /* name          cmd  */
-  {"spterm",       spcmd1},
-  {"splf",         spcmd2},
-  {"spcalcu",      spcmd3},
-  {"spvol",        spcmd4},
-  {"sptop",        spcmd5},
-  {"spcurse",      spcmd6},
-  {"spnote",       spcmd7},
+  {"spterm",       spterm},
+  {"splf",         spfm},
+  {"spcalcu",      spbc},
+  {"spvol",        sppm},
+  {"sptop",        sptop},
+  {"spnote",       sporg},
   {"dcmd",         dcmd},
   {"ytmcmd",       ytmcmd},
 };
 
-/* keybindings */
+/* key bindings */
 #include "movestack.c"
 static Key keys[] = {
   /* modifier                     chain key      key        function        argument */
@@ -162,11 +165,10 @@ static Key keys[] = {
   { MODKEY,                       XK_s,          XK_f,      togglesp,       {.ui = 1 } },
   { MODKEY,                       XK_s,          XK_F9,     togglesp,       {.ui = 2 } },
   { MODKEY|ControlMask,           -1,            XK_v,      togglesp,       {.ui = 3 } },
-  { MODKEY,                       -1,            XK_g,      togglesp,       {.ui = 4 } },
-  { MODKEY|ControlMask,           -1,            XK_c,      togglesp,       {.ui = 5 } },
-  { MODKEY,                       XK_s,          XK_n,      togglesp,       {.ui = 6 } },
-  { MODKEY,                       XK_s,          XK_d,      togglesp,       {.ui = 7 } },
-  { MODKEY,                       XK_s,          XK_y,      togglesp,       {.ui = 8 } },
+  { MODKEY,                       -1,          XK_g,      togglesp,       {.ui = 4 } },
+  { MODKEY,                       XK_s,          XK_n,      togglesp,       {.ui = 5 } },
+  { MODKEY,                       XK_s,          XK_d,      togglesp,       {.ui = 6 } },
+  { MODKEY,                       XK_s,          XK_y,      togglesp,       {.ui = 7 } },
 
   { MODKEY,                       -1,            XK_grave,  view,           {.ui = ~0 } },
   { MODKEY|ShiftMask,             -1,            XK_grave,  tag,            {.ui = ~0 } },
@@ -186,31 +188,34 @@ static Key keys[] = {
   { MODKEY,                       -1,            XK_t,      setlayout,      {.v = &layouts[0]} },
   { MODKEY,                       -1,            XK_i,      incnmaster,     {.i = +1 } },
   { MODKEY,                       -1,            XK_p,      spawn,          {.v = dmenucmd } },
+  { MODKEY|ControlMask,           -1,            XK_p,      spawn,          {.v = passcmd } },
 
+  { MODKEY,                       XK_c,          XK_s, 	    restorewin,     {0}},
   { MODKEY,                       -1,            XK_d,      incnmaster,     {.i = -1 } },
 	{ MODKEY,                       -1,            XK_f,      togglefullscr,  {0} },
   { MODKEY,                       -1,            XK_h,      setmfact,       {.f = -0.025 } },
+  { MODKEY,                       XK_c,          XK_h, 	    hidewin,        {0}},
   { MODKEY|ShiftMask,             -1,            XK_h,      setcfact,       {.f = -0.20 } },
-  { MODKEY|ShiftMask|ControlMask, -1,            XK_h,      moveresize,     {.v = "0x 0y -25w 0h" } },
-  { ControlMask|ShiftMask,        -1,            XK_h,      moveresize,     {.v = "-25x 0y 0w 0h" } },
+  { Mod4Mask|ShiftMask,           -1,            XK_h,      moveresize,     {.v = "0x 0y -25w 0h" } },
+  { Mod4Mask,                     -1,            XK_h,      moveresize,     {.v = "-25x 0y 0w 0h" } },
   { MODKEY,                       -1,            XK_j,      focusstack,     {.i = +1 } },
   { MODKEY|ShiftMask,             -1,            XK_j,      movestack,      {.i = +1 } },
-  { MODKEY|ShiftMask|ControlMask, -1,            XK_j,      moveresize,     {.v = "0x 0y 0w 25h" } },
-  { ControlMask|ShiftMask,        -1,            XK_j,      moveresize,     {.v = "0x 25y 0w 0h" } },
+  { Mod4Mask|ShiftMask,           -1,            XK_j,      moveresize,     {.v = "0x 0y 0w 25h" } },
+  { Mod4Mask,                     -1,            XK_j,      moveresize,     {.v = "0x 25y 0w 0h" } },
   { MODKEY,                       -1,            XK_k,      focusstack,     {.i = -1 } },
   { MODKEY|ShiftMask,             -1,            XK_k,      movestack,      {.i = -1 } },
-  { MODKEY|ShiftMask|ControlMask, -1,            XK_k,      moveresize,     {.v = "0x 0y 0w -25h" } },
-  { ControlMask|ShiftMask,        -1,            XK_k,      moveresize,     {.v = "0x -25y 0w 0h" } },
+  { Mod4Mask|ShiftMask,           -1,            XK_k,      moveresize,     {.v = "0x 0y 0w -25h" } },
+  { Mod4Mask,                     -1,            XK_k,      moveresize,     {.v = "0x -25y 0w 0h" } },
   { MODKEY,                       -1,            XK_l,      setmfact,       {.f = +0.025 } },
   { MODKEY|ShiftMask,             -1,            XK_l,      setcfact,       {.f = +0.20 } },
-  { MODKEY|ShiftMask|ControlMask, -1,            XK_l,      moveresize,     {.v = "0x 0y 25w 0h" } },
-  { ControlMask|ShiftMask,        -1,            XK_l,      moveresize,     {.v = "25x 0y 0w 0h" } },
+  { Mod4Mask|ShiftMask,           -1,            XK_l,      moveresize,     {.v = "0x 0y 25w 0h" } },
+  { Mod4Mask,                     -1,            XK_l,      moveresize,     {.v = "25x 0y 0w 0h" } },
   { MODKEY,                       -1,            XK_Return, zoom,           {0} },
 
   { MODKEY,                       -1,            XK_b,      togglebar,      {0} },
   { MODKEY|ControlMask,           -1,            XK_b,      spawn,          SHCMD("bluetoothdmenu.sh") },
   // { MODKEY,                       -1,            XK_m,      setlayout,      {.v = &layouts[1]} },
-  { MODKEY|ShiftMask,             -1,            XK_m,      movecenter,     {0} },
+  { Mod4Mask,                     -1,            XK_m,      movecenter,     {0} },
   { MODKEY,                       -1,            XK_comma,  focusmonx,      {.i = 0 } },
   { MODKEY|ShiftMask,             -1,            XK_comma,  tagmon,         {.i = -1 } },
   { MODKEY,                       -1,            XK_period, focusmonx,      {.i = 1 } },
@@ -223,14 +228,10 @@ static Key keys[] = {
   { MODKEY,                       -1,            XK_F7,     spawn,          SHCMD("dmenuumount.sh") },
   { MODKEY,                       -1,            XK_F8,     spawn,          SHCMD("dmenumount.sh") },
   { MODKEY,                       -1,            XK_F10,    spawn,          SHCMD("playerctl play-pause") },
-  { 0,                            -1,            XK_Print,  spawn,          {.v = sscmd } },
+  { 0,                            -1,            XK_Print,  spawn,          SHCMD("screenshot") },
   { 0,                            -1,            XF86XK_AudioPlay, spawn,   SHCMD("playerctl play-pause") },
   { 0,                            -1,            XF86XK_AudioNext, spawn,   SHCMD("playerctl next") },
 
-  // test
-  /* {MODKEY, 						XK_w, 	   hideotherwins,  {0}},
-  {MODKEY|ShiftMask, 				XK_w, 	   restoreotherwins, {0}}, */
-  
 };
 
 /* button definitions */
