@@ -239,16 +239,16 @@ static void setfocus(Client *c);
 static void setfullscreen(Client *c, int fullscreen);
 static void getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int *nc);
 static void getfacts(Monitor *m, int msize, int ssize, float *mf, float *sf, int *mr, int *sr);
-static void setgaps(int oh, int ov, int ih, int iv);
-static void incrgaps(const Arg *arg);
-static void incrigaps(const Arg *arg);
-static void incrogaps(const Arg *arg);
-static void incrohgaps(const Arg *arg);
-static void incrovgaps(const Arg *arg);
-static void incrihgaps(const Arg *arg);
-static void incrivgaps(const Arg *arg);
-static void togglegaps(const Arg *arg);
-static void defaultgaps(const Arg *arg);
+// static void setgaps(int oh, int ov, int ih, int iv);
+// static void incrgaps(const Arg *arg);
+// static void incrigaps(const Arg *arg);
+// static void incrogaps(const Arg *arg);
+// static void incrohgaps(const Arg *arg);
+// static void incrovgaps(const Arg *arg);
+// static void incrihgaps(const Arg *arg);
+// static void incrivgaps(const Arg *arg);
+// static void togglegaps(const Arg *arg);
+// static void defaultgaps(const Arg *arg);
 static void centeredmaster(Monitor *m);
 static void setlayout(const Arg *arg);
 static void setcfact(const Arg *arg);
@@ -1979,7 +1979,7 @@ setfullscreen(Client *c, int fullscreen)
 	}
 }
 
-void
+/* void
 setgaps(int oh, int ov, int ih, int iv)
 {
 	if (oh < 0) oh = 0;
@@ -2082,7 +2082,7 @@ incrivgaps(const Arg *arg)
 		selmon->gappih,
 		selmon->gappiv + arg->i
 	);
-}
+} */
 
 void
 setlayout(const Arg *arg)
