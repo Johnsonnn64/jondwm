@@ -113,10 +113,15 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static char monsize[1890];
+static char monsize[1920];
+/* dmenu */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-x", "15", "-y", "15", "-z", monsize, NULL };
 static const char *clipcmd[] = { "clipmenu", "-m", dmenumon, "-x", "15", "-y", "15", "-z", monsize, NULL };
 static const char *passcmd[] = { "passmenu", "-m", dmenumon, "-x", "15", "-y", "15", "-z", monsize, NULL };
+static const char *mountcmd[] = { "dmenumount", "-m", dmenumon, "-x", "15", "-y", "15", "-z", monsize, NULL };
+static const char *umountcmd[] = { "dmenuumount", "-m", dmenumon, "-x", "15", "-y", "15", "-z", monsize, NULL };
+static const char *wikicmd[] = { "wikimenu", "-m", dmenumon, "-x", "15", "-y", "15", "-z", monsize, NULL };
+
 static const char *termcmd[]  = { "st", NULL };
 
 typedef struct {
@@ -183,6 +188,7 @@ static Key keys[] = {
   { MODKEY,                       -1,            XK_Tab,    spawn,          {.v = clipcmd } },
   { MODKEY,                       -1,            XK_q,      killclient,     {0} },
   { MODKEY|ShiftMask,             -1,            XK_q,      quit,           {0} },
+  { MODKEY,                       -1,            XK_w,      spawn,          {.v = wikicmd } },
   { MODKEY,                       -1,            XK_r,      spawn,          {.v = termcmd } },
   { MODKEY|ShiftMask,             -1,            XK_r,      quit,           {1} },
   { MODKEY,                       -1,            XK_t,      setlayout,      {.v = &layouts[0]} },
@@ -225,8 +231,8 @@ static Key keys[] = {
 
   { MODKEY,                       -1,            XK_F5,     spawn,          SHCMD("sudo xbacklight -dec 5") },
   { MODKEY,                       -1,            XK_F6,     spawn,          SHCMD("sudo xbacklight -inc 5") },
-  { MODKEY,                       -1,            XK_F7,     spawn,          SHCMD("dmenuumount.sh") },
-  { MODKEY,                       -1,            XK_F8,     spawn,          SHCMD("dmenumount.sh") },
+  { MODKEY,                       -1,            XK_F7,     spawn,          {.v = umountcmd } },
+  { MODKEY,                       -1,            XK_F8,     spawn,          {.v = mountcmd } },
   { MODKEY,                       -1,            XK_F10,    spawn,          SHCMD("playerctl play-pause") },
   { 0,                            -1,            XK_Print,  spawn,          SHCMD("screenshot") },
   { 0,                            -1,            XF86XK_AudioPlay, spawn,   SHCMD("playerctl play-pause") },
