@@ -4,7 +4,7 @@
 #include <X11/XF86keysym.h>
 
 /* appearance */
-static const unsigned int borderpx     = 1;    /* border pixel of windows */
+static const unsigned int borderpx     = 2;    /* border pixel of windows */
 static const unsigned int snap         = 32;   /* snap pixel */
 static const int showbar               = 1;    /* 0 means no bar */
 static const int topbar                = 1;    /* 0 means bottom bar */
@@ -15,8 +15,8 @@ static const unsigned int gappoh       = 15;   /* horiz outer gap between window
 static const unsigned int gappov       = 15;   /* vert outer gap between windows and screen edge */
 static const int smartgaps             = 0;    /* 1 means no outer gap when there is only one window */
 static const int user_bh               = 28;   /* user assigned bar height */
-static const int vertpad               = 15;   /* statusbar verical padding */
-static const int sidepad               = 15;   /* statusbar side padding */
+static const int vertpad               = 0;   /* statusbar verical padding */
+static const int sidepad               = 350;   /* statusbar side padding */
 static const int focusonwheel          = 0;    /* click on focus with mousewheel */
 static const unsigned int colorfultag  = 1;    /* 0 means use SchemeSel for selected tag */
 static const char *fonts[]             = { "JetBrainsMono Nerd Font:style=Medium:size=9:antialias=true",
@@ -170,7 +170,7 @@ static Key keys[] = {
   { MODKEY,                       XK_s,          XK_f,      togglesp,       {.ui = 1 } },
   { MODKEY,                       XK_s,          XK_F9,     togglesp,       {.ui = 2 } },
   { MODKEY|ControlMask,           -1,            XK_v,      togglesp,       {.ui = 3 } },
-  { MODKEY,                       -1,          XK_g,      togglesp,       {.ui = 4 } },
+  { MODKEY,                       -1,            XK_g,      togglesp,       {.ui = 4 } },
   { MODKEY,                       XK_s,          XK_n,      togglesp,       {.ui = 5 } },
   { MODKEY,                       XK_s,          XK_d,      togglesp,       {.ui = 6 } },
   { MODKEY,                       XK_s,          XK_y,      togglesp,       {.ui = 7 } },
@@ -188,7 +188,7 @@ static Key keys[] = {
   { MODKEY,                       -1,            XK_Tab,    spawn,          {.v = clipcmd } },
   { MODKEY,                       -1,            XK_q,      killclient,     {0} },
   { MODKEY|ShiftMask,             -1,            XK_q,      quit,           {0} },
-  { MODKEY,                       -1,            XK_w,      spawn,          {.v = wikicmd } },
+  { MODKEY|ShiftMask,             -1,            XK_w,      spawn,          {.v = wikicmd } },
   { MODKEY,                       -1,            XK_r,      spawn,          {.v = termcmd } },
   { MODKEY|ShiftMask,             -1,            XK_r,      quit,           {1} },
   { MODKEY,                       -1,            XK_t,      setlayout,      {.v = &layouts[0]} },
@@ -229,8 +229,8 @@ static Key keys[] = {
   { MODKEY,                       -1,            XK_space,  spawn,          SHCMD("dunstctl close-all") },
   { MODKEY|ShiftMask,             -1,            XK_space,  togglefloating, {0} },
 
-  { MODKEY,                       -1,            XK_F5,     spawn,          SHCMD("sudo xbacklight -dec 5") },
-  { MODKEY,                       -1,            XK_F6,     spawn,          SHCMD("sudo xbacklight -inc 5") },
+  { MODKEY,                       -1,            XK_F5,     spawn,          SHCMD("bright_down") },
+  { MODKEY,                       -1,            XK_F6,     spawn,          SHCMD("bright_up") },
   { MODKEY,                       -1,            XK_F7,     spawn,          {.v = umountcmd } },
   { MODKEY,                       -1,            XK_F8,     spawn,          {.v = mountcmd } },
   { MODKEY,                       -1,            XK_F10,    spawn,          SHCMD("playerctl play-pause") },
