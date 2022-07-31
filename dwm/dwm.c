@@ -2580,6 +2580,13 @@ togglesp(const Arg *arg)
 void
 togglefullscr(const Arg *arg)
 {
+  Client *i;
+
+  for (i = selmon->clients; i; i = i->next) {
+    if (i != selmon->sel && i->tags == selmon->tagset[selmon->seltags] && i->isfullscreen)
+      return;
+  }
+
   if(selmon->sel) {
     setfullscreen(selmon->sel, !selmon->sel->isfullscreen);
     selmon->sel->isfullscreen ? hideotherwins(arg) : restoreotherwins(arg);
