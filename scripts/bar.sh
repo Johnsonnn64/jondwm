@@ -32,15 +32,22 @@ battery() {
   if [ -f /sys/class/power_supply/BAT0/capacity ]; then
     get_capacity="$(cat /sys/class/power_supply/BAT0/capacity)"
     ac_state="$(cat /sys/class/power_supply/AC/online)"
+    read=~/.cache/batt
+    reset=$(cat "$read")
 
     if [ "$ac_state" -eq 1 ]; then
       printf "^c$green^ $get_capacity"
+      echo "1" > "$read"
     else
-      if [ "$get_capacity" -le 20 ]; then
+      if [ "$get_capacity" -le 15 ]; then
+        if [ "$reset" -eq 1 ]; then
+          notify-send -u critical "Low Battery!" "Please Charge"
+          echo "0" > "$read"
+        fi
         printf "^c$red^  $get_capacity"
-        notify-send -u critical "Low Battery!" "Please Charge"
       else
         printf "^c$yellow^  $get_capacity"
+        echo "1" > "$read"
       fi
     fi
   fi
