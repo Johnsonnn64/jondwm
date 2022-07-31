@@ -114,13 +114,15 @@ static const Layout layouts[] = {
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static char monsize[1920];
+static char ds[600];
+static char dv[600];
 /* dmenu */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-x", "15", "-y", "15", "-z", monsize, NULL };
-static const char *clipcmd[] = { "clipmenu", "-m", dmenumon, "-x", "15", "-y", "15", "-z", monsize, NULL };
-static const char *passcmd[] = { "passmenu", "-m", dmenumon, "-x", "15", "-y", "15", "-z", monsize, NULL };
-static const char *mountcmd[] = { "dmenumount", "-m", dmenumon, "-x", "15", "-y", "15", "-z", monsize, NULL };
-static const char *umountcmd[] = { "dmenuumount", "-m", dmenumon, "-x", "15", "-y", "15", "-z", monsize, NULL };
-static const char *wikicmd[] = { "wikimenu", "-m", dmenumon, "-x", "15", "-y", "15", "-z", monsize, NULL };
+static const char *dmenucmd[] = { "dmenu_run",     "-x", ds, "-y", dv, "-z", monsize, "-m", dmenumon, NULL };
+static const char *clipcmd[] = { "clipmenu",       "-x", ds, "-y", dv, "-z", monsize, "-m", dmenumon, NULL };
+static const char *passcmd[] = { "passmenu",       "-x", ds, "-y", dv, "-z", monsize, "-m", dmenumon, NULL };
+static const char *mountcmd[] = { "dmenumount",    "-x", ds, "-y", dv, "-z", monsize, "-m", dmenumon, NULL };
+static const char *umountcmd[] = { "dmenuumount",  "-x", ds, "-y", dv, "-z", monsize, "-m", dmenumon, NULL };
+static const char *wikicmd[] = { "wikimenu",       "-x", ds, "-y", dv, "-z", monsize, "-m", dmenumon, NULL };
 
 static const char *termcmd[]  = { "st", NULL };
 

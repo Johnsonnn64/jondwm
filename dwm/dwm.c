@@ -2388,8 +2388,12 @@ void
 spawn(const Arg *arg)
 {
   dmenumon[0] = '0' + selmon->num;
+  int side = sidepad;
+  int vert = vertpad;
   int size = selmon->ww - sidepad *2;
   sprintf(monsize, "%d", size);
+  sprintf(ds, "%d", side);
+  sprintf(dv, "%d", vert);
 	if (fork() == 0) {
 		if (dpy)
 			close(ConnectionNumber(dpy));
