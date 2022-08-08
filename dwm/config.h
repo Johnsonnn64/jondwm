@@ -16,7 +16,7 @@ static const unsigned int gappov       = 15;   /* vert outer gap between windows
 static const int smartgaps             = 0;    /* 1 means no outer gap when there is only one window */
 static const int user_bh               = 28;   /* user assigned bar height */
 static const int vertpad               = 0;   /* statusbar verical padding */
-static const int sidepad               = 350;   /* statusbar side padding */
+static const int sidepad               = 0;   /* statusbar side padding */
 static const int focusonwheel          = 0;    /* click on focus with mousewheel */
 static const unsigned int colorfultag  = 1;    /* 0 means use SchemeSel for selected tag */
 static const char *fonts[]             = { "JetBrainsMono Nerd Font:style=Medium:size=9:antialias=true",
@@ -94,6 +94,7 @@ static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen win
 static const Layout layouts[] = {
   /* symbol     arrange function */
   { "󰊠",        tile },    /* first entry is default */
+  { "[M]",      monocle },
   { "|M|",      centeredmaster },
   { "><>",      NULL },    /* no layout function means floating behavior */
 };
@@ -222,7 +223,7 @@ static Key keys[] = {
 
   { MODKEY,                       -1,            XK_b,      togglebar,      {0} },
   { MODKEY|ControlMask,           -1,            XK_b,      spawn,          SHCMD("bluetoothdmenu.sh") },
-  // { MODKEY,                       -1,            XK_m,      setlayout,      {.v = &layouts[1]} },
+  { MODKEY,                       -1,            XK_m,      setlayout,      {.v = &layouts[1]} },
   { Mod4Mask,                     -1,            XK_m,      movecenter,     {0} },
   { MODKEY,                       -1,            XK_comma,  focusmonx,      {.i = 0 } },
   { MODKEY|ShiftMask,             -1,            XK_comma,  tagmon,         {.i = -1 } },
