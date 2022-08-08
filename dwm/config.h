@@ -105,9 +105,7 @@ static const Layout layouts[] = {
   { MODKEY,                        CHAIN,  KEY,  view,        {.ui = 1 << TAG} }, \
   { MODKEY|ControlMask,            CHAIN,  KEY,  toggleview,  {.ui = 1 << TAG} }, \
   { MODKEY|ShiftMask,              CHAIN,  KEY,  tag,         {.ui = 1 << TAG} }, \
-	{ MODKEY|ControlMask|ShiftMask,  CHAIN,  KEY,  toggletag,   {.ui = 1 << TAG} }, \
-	{ MODKEY|Mod4Mask,               CHAIN,  KEY,  tagnextmon,  {.ui = 1 << TAG} }, \
-	{ MODKEY|Mod4Mask|ShiftMask,     CHAIN,  KEY,  tagprevmon,  {.ui = 1 << TAG} },
+	{ MODKEY|ControlMask|ShiftMask,  CHAIN,  KEY,  toggletag,   {.ui = 1 << TAG} }, 
 
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
@@ -225,10 +223,12 @@ static Key keys[] = {
   { MODKEY|ControlMask,           -1,            XK_b,      spawn,          SHCMD("bluetoothdmenu.sh") },
   { MODKEY,                       -1,            XK_m,      setlayout,      {.v = &layouts[1]} },
   { Mod4Mask,                     -1,            XK_m,      movecenter,     {0} },
-  { MODKEY,                       -1,            XK_comma,  focusmonx,      {.i = 0 } },
-  { MODKEY|ShiftMask,             -1,            XK_comma,  tagmon,         {.i = -1 } },
-  { MODKEY,                       -1,            XK_period, focusmonx,      {.i = 1 } },
-  { MODKEY|ShiftMask,             -1,            XK_period, tagmon,         {.i = +1 } },
+  { MODKEY,                       -1,            XK_comma,  focusnthmon,    {.i = 0 } },
+  { MODKEY|ShiftMask,             -1,            XK_comma,  tagmon,         {.i = 0 } },
+  { MODKEY,                       -1,            XK_period, focusnthmon,    {.i = 1 } },
+  { MODKEY|ShiftMask,             -1,            XK_period, tagmon,         {.i = 1 } },
+  { MODKEY,                       -1,            XK_slash,  focusnthmon,    {.i = 2 } },
+  { MODKEY|ShiftMask,             -1,            XK_slash,  tagmon,         {.i = 2 } },
   { MODKEY,                       -1,            XK_space,  spawn,          SHCMD("dunstctl close-all") },
   { MODKEY|ShiftMask,             -1,            XK_space,  togglefloating, {0} },
 
