@@ -2396,9 +2396,17 @@ tag(const Arg *arg)
 void
 tagmon(const Arg *arg)
 {
+  Monitor *m = numtomon(arg->i);
+
 	if (!selmon->sel || !mons->next)
 		return;
-	sendmon(selmon->sel, numtomon(arg->i));
+	sendmon(selmon->sel, m);
+
+  unfocus(selmon->sel, 0);
+  selmon = m; 
+  focus(NULL);
+  
+  XWarpPointer(dpy, None, selmon->sel->win, 0, 0, 0, 0, selmon->sel->w/2, selmon->sel->h/2);
 }
 
 void
