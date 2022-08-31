@@ -44,9 +44,9 @@ battery() {
           notify-send -u critical "Low Battery!" "Please Charge"
           echo "0" > "$read"
         fi
-        printf "^c$red^  $get_capacity"
+        printf "^c$red^ $get_capacity"
       else
-        printf "^c$yellow^  $get_capacity"
+        printf "^c$yellow^ $get_capacity"
         echo "1" > "$read"
       fi
     fi
@@ -55,7 +55,7 @@ battery() {
 
 brightness() {
   if [ -f /sys/class/backlight/*/brightness ]; then
-    printf "^c$red^   "
+    printf "^c$red^  "
     printf "^c$red^%.0f\n" $(i=$(cat /sys/class/backlight/*/brightness)
     echo $i/25 | bc)0
   fi
@@ -76,7 +76,7 @@ wlan() {
 }
 
 clock() {
-	printf "^c$blue^ "
+	printf "^c$blue^"
   printf " $(date '+%a, %m-%d ')"
   printf " 󱑆"
 	printf " $(date '+%H:%M')"
