@@ -2388,8 +2388,10 @@ tag(const Arg *arg)
 		c = selmon->sel;
 		selmon->sel->tags = arg->ui & TAGMASK;
 		setclienttagprop(c);
-		focus(NULL);
-		arrange(selmon);
+    view(arg);
+    /* removing because both are present in view()*/
+		// focus(NULL);
+		// arrange(selmon);
 	}
 }
 
