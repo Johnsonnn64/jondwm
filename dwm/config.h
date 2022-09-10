@@ -117,12 +117,15 @@ static char monsize[1920];
 static char ds[600];
 static char dv[600];
 /* dmenu */
-static const char *dmenucmd[] = { "dmenu_run",     "-x", ds, "-y", dv, "-z", monsize, "-m", dmenumon, NULL };
-static const char *clipcmd[] = { "clipmenu",       "-x", ds, "-y", dv, "-z", monsize, "-m", dmenumon, NULL };
-static const char *passcmd[] = { "passmenu",       "-x", ds, "-y", dv, "-z", monsize, "-m", dmenumon, NULL };
-static const char *mountcmd[] = { "dmenumount",    "-x", ds, "-y", dv, "-z", monsize, "-m", dmenumon, NULL };
-static const char *umountcmd[] = { "dmenuumount",  "-x", ds, "-y", dv, "-z", monsize, "-m", dmenumon, NULL };
-static const char *wikicmd[] = { "wikimenu",       "-x", ds, "-y", dv, "-z", monsize, "-m", dmenumon, NULL };
+#define DMENUS(NAME,CMD) \
+  static const char *NAME[] = { CMD, "-x", ds, "-y", dv, "-z", monsize, "-m", dmenumon, NULL };
+
+DMENUS(dmenucmd, "dmenu_run")
+DMENUS(clipcmd, "clipmenu")
+DMENUS(passcmd, "passmenu")
+DMENUS(mountcmd, "dmenumount")
+DMENUS(umountcmd, "dmenuumount")
+DMENUS(wikicmd, "wikimenu")
 
 static const char *termcmd[]  = { "st", NULL };
 
@@ -241,7 +244,6 @@ static Key keys[] = {
   { 0,                            -1,            XK_Print,  spawn,          SHCMD("screenshot") },
   { 0,                            -1,            XF86XK_AudioPlay, spawn,   SHCMD("playerctl play-pause") },
   { 0,                            -1,            XF86XK_AudioNext, spawn,   SHCMD("playerctl next") },
-
 };
 
 /* button definitions */
