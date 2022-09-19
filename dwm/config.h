@@ -111,14 +111,12 @@ static const Layout layouts[] = {
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
-/* commands */
-static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static char monsize[1920];
-static char ds[600];
-static char dv[600];
 /* dmenu */
+static char ds[3] = "0";
+static char dv[3] = "0";
+static char ms[12];
 #define DMENUS(NAME,CMD) \
-  static const char *NAME[] = { CMD, "-x", ds, "-y", dv, "-z", monsize, "-m", dmenumon, NULL };
+  static const char *NAME[] = { CMD, "-x", ds, "-y", dv, "-z", ms, /* "-m", dmenumon, */ NULL };
 
 DMENUS(dmenucmd, "dmenu_run")
 DMENUS(clipcmd, "clipmenu")
