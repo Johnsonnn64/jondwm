@@ -2565,7 +2565,7 @@ togglefullscr(const Arg *arg)
   }
 
   if(selmon->sel) {
-    if ((selmon->showbar + selmon->clients->isfullscreen) == 1) 
+    if ((selmon->showbar + selmon->sel->isfullscreen) == 1) 
       togglebar(NULL);
     setfullscreen(selmon->sel, !selmon->sel->isfullscreen);
     selmon->sel->isfullscreen ? hideotherwins(arg) : restoreotherwins(arg);
