@@ -225,6 +225,7 @@ static Key keys[] = {
 
   { MODKEY,              -1,         XK_b,      togglebar,      {0} },
   { MODKEY|ControlMask,  -1,         XK_b,      spawn,          SHCMD("bluetoothdmenu.sh") },
+  { MODKEY,              -1,         XK_n,      spawn,          SHCMD("st nvim") },
   { MODKEY,              -1,         XK_m,      setlayout,      {.v = &layouts[1]} },
   { Mod4Mask,            -1,         XK_m,      movecenter,     {0} },
   { MODKEY,              -1,         XK_comma,  focusnthmon,    {.i = 0 } },
