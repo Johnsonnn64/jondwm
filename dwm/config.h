@@ -15,8 +15,8 @@ static const unsigned int gappoh       = 15;   /* horiz outer gap between window
 static const unsigned int gappov       = 15;   /* vert outer gap between windows and screen edge */
 static const int smartgaps             = 0;    /* 1 means no outer gap when there is only one window */
 static const int user_bh               = 30;   /* user assigned bar height */
-static const int vertpad               = 0;   /* statusbar verical padding */
-static const int sidepad               = 0;   /* statusbar side padding */
+static const int vertpad               = 0;    /* statusbar verical padding */
+static const int sidepad               = 0;    /* statusbar side padding */
 static const int focusonwheel          = 0;    /* click on focus with mousewheel */
 static const unsigned int colorfultag  = 1;    /* 0 means use SchemeSel for selected tag */
 static const char *fonts[]             = { "JetBrainsMono Nerd Font:style=Medium:size=9:antialias=true",
