@@ -2564,7 +2564,7 @@ togglesp(const Arg *arg)
     if (!new) {
       Arg sparg = {.v = scratchpads[i].cmd};
       spawn(&sparg);
-    } else {
+    } else if (new && selmon->sel) {
       selmon->sel->spnew = arg->ui;
       togglesp(arg);
     }
