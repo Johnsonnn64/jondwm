@@ -128,7 +128,7 @@ DMENUS(wikicmd, "wikimenu")
 static const char *termcmd[]  = { "st", NULL };
 
 typedef struct {
-  const char *name;
+  char *rule;
   const void *cmd;
 } Sp;
 
@@ -169,14 +169,25 @@ static Sp scratchpads[] = {
 #include "movestack.c"
 static Key keys[] = {
   /* modifier            chain key   key        function        argument */
-  { MODKEY|ShiftMask,    -1,         XK_Return, togglesp,       {.ui = 0 } },
-  { MODKEY,              XK_s,       XK_f,      togglesp,       {.ui = 1 } },
-  { MODKEY,              XK_s,       XK_F9,     togglesp,       {.ui = 2 } },
-  { MODKEY|ControlMask,  -1,         XK_v,      togglesp,       {.ui = 3 } },
-  { MODKEY,              -1,         XK_g,      togglesp,       {.ui = 4 } },
-  { MODKEY,              XK_s,       XK_n,      togglesp,       {.ui = 5 } },
-  { MODKEY,              XK_s,       XK_d,      togglesp,       {.ui = 6 } },
-  { MODKEY,              XK_s,       XK_y,      togglesp,       {.ui = 7 } },
+  { MODKEY|ShiftMask,    -1,         XK_Return, togglesp,       {.c = "spterm" } },
+  { MODKEY,              XK_s,       XK_f,      togglesp,       {.c = "splf" } },
+  { MODKEY,              XK_s,       XK_F9,     togglesp,       {.c = "spcalcu" } },
+  { MODKEY|ControlMask,  -1,         XK_v,      togglesp,       {.c = "spvol" } },
+  { MODKEY,              -1,         XK_g,      togglesp,       {.c = "sptop" } },
+  { MODKEY,              XK_s,       XK_n,      togglesp,       {.c = "spnote" } },
+  { MODKEY,              XK_s,       XK_d,      togglesp,       {.c = "dcmd" } },
+  { MODKEY,              XK_s,       XK_y,      togglesp,       {.c = "ytcmd" } },
+
+  { MODKEY,              XK_s,       XK_1,      togglesp,       {.ui = 1} }, 
+  { MODKEY,              XK_s,       XK_2,      togglesp,       {.ui = 2} }, 
+  { MODKEY,              XK_s,       XK_3,      togglesp,       {.ui = 3} }, 
+  { MODKEY,              XK_s,       XK_4,      togglesp,       {.ui = 4} }, 
+  { MODKEY,              XK_s,       XK_5,      togglesp,       {.ui = 5} }, 
+  { MODKEY,              XK_s,       XK_6,      togglesp,       {.ui = 6} }, 
+  { MODKEY,              XK_s,       XK_7,      togglesp,       {.ui = 7} }, 
+  { MODKEY,              XK_s,       XK_8,      togglesp,       {.ui = 8} }, 
+  { MODKEY,              XK_s,       XK_9,      togglesp,       {.ui = 9} }, 
+  { MODKEY,              XK_s,       XK_0,      togglesp,       {.ui = 10} }, 
 
   { MODKEY,              -1,         XK_grave,  view,           {.ui = ~0 } },
   { MODKEY|ShiftMask,    -1,         XK_grave,  tag,            {.ui = ~0 } },

@@ -81,6 +81,7 @@ typedef union {
 	int i;
 	unsigned int ui;
 	float f;
+  char *c;
 	const void *v;
 } Arg;
 
@@ -103,7 +104,8 @@ struct Client {
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh, hintsvalid;
 	int bw, oldbw;
 	unsigned int tags;
-	int isfixed, iscentered, isfloating, isurgent, neverfocus, oldstate, isfullscreen, isterminal, noswallow, spnum, isalwaysontop;
+	int isfixed, iscentered, isfloating, isurgent, neverfocus, oldstate, isfullscreen, isterminal, noswallow, isalwaysontop, spnew;
+  char spnum;
   pid_t pid;
 	Client *next;
 	Client *snext;
@@ -2526,11 +2528,23 @@ togglesp(const Arg *arg)
 {
   Monitor *m;
   Client *c;
-  unsigned int found = 0;
-  Arg sparg = {.v = scratchpads[arg->ui].cmd};
+  unsigned int found = 0, new = 1, i;
+
+  for (i = 0; i < LENGTH(scratchpads); i ++) {
+    if (arg->c == scratchpads[i].rule) {
+      new = 0; 
+      break;
+    }
+  }
+
   for (m = mons; m; m = m->next) {
-    for (c = m->clients; c && !(found = c->spnum == arg->ui); c = c->next);
-    if (found) break;
+    if (!new) {
+      for (c = m->clients; c && !(found = c->spnum == i); c = c->next);
+      if (found) break;
+    } else {
+      for (c = m->clients; c && !(found = c->spnew == arg->ui); c = c->next);
+      if (found) break;
+    }
   }
   if (found) {
     if (m == selmon) {
@@ -2547,7 +2561,13 @@ togglesp(const Arg *arg)
       if (c->isfullscreen) hideotherwins(arg);
     }
   } else {
-    spawn(&sparg);
+    if (!new) {
+      Arg sparg = {.v = scratchpads[i].cmd};
+      spawn(&sparg);
+    } else {
+      selmon->sel->spnew = arg->ui;
+      togglesp(arg);
+    }
   }
 }
 
