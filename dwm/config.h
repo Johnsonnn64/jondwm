@@ -176,7 +176,7 @@ static Key keys[] = {
   { MODKEY,              -1,         XK_g,      togglesp,       {.c = "sptop" } },
   { MODKEY,              XK_s,       XK_n,      togglesp,       {.c = "spnote" } },
   { MODKEY,              XK_s,       XK_d,      togglesp,       {.c = "dcmd" } },
-  { MODKEY,              XK_s,       XK_y,      togglesp,       {.c = "ytcmd" } },
+  { MODKEY,              XK_s,       XK_y,      togglesp,       {.c = "ytmcmd" } },
 
   { MODKEY,              XK_s,       XK_1,      togglesp,       {.ui = 1} }, 
   { MODKEY,              XK_s,       XK_2,      togglesp,       {.ui = 2} }, 
