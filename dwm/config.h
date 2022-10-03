@@ -251,6 +251,8 @@ static Key keys[] = {
   { MODKEY,              -1,         XK_F7,     spawn,          {.v = umountcmd } },
   { MODKEY,              -1,         XK_F8,     spawn,          {.v = mountcmd } },
   { MODKEY,              -1,         XK_F10,    spawn,          SHCMD("playerctl play-pause") },
+  { MODKEY,              -1,         XK_F11,    spawn,          SHCMD("playerctl previous") },
+  { MODKEY,              -1,         XK_F12,    spawn,          SHCMD("playerctl next") },
   { 0,                   -1,         XK_Print,  spawn,          SHCMD("screenshot") },
   { 0,                   -1,         XF86XK_AudioPlay, spawn,   SHCMD("playerctl play-pause") },
   { 0,                   -1,         XF86XK_AudioNext, spawn,   SHCMD("playerctl next") },
