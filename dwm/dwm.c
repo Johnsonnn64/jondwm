@@ -81,7 +81,6 @@ typedef union {
 	int i;
 	unsigned int ui;
 	float f;
-  char *c;
 	const void *v;
 } Arg;
 
@@ -2542,7 +2541,7 @@ togglesp(const Arg *arg)
   unsigned int found = 0, new = 1, i;
 
   for (i = 0; i < LENGTH(scratchpads); i ++) {
-    if (arg->c == scratchpads[i].rule) {
+    if (arg->v == scratchpads[i].rule) {
       new = 0; 
       break;
     }

@@ -169,14 +169,14 @@ static Sp scratchpads[] = {
 #include "movestack.c"
 static Key keys[] = {
   /* modifier            chain key   key        function        argument */
-  { MODKEY|ShiftMask,    -1,         XK_Return, togglesp,       {.c = "spterm" } },
-  { MODKEY,              XK_s,       XK_f,      togglesp,       {.c = "splf" } },
-  { MODKEY,              XK_s,       XK_F9,     togglesp,       {.c = "spcalcu" } },
-  { MODKEY|ControlMask,  -1,         XK_v,      togglesp,       {.c = "spvol" } },
-  { MODKEY,              -1,         XK_g,      togglesp,       {.c = "sptop" } },
-  { MODKEY,              XK_s,       XK_n,      togglesp,       {.c = "spnote" } },
-  { MODKEY,              XK_s,       XK_d,      togglesp,       {.c = "dcmd" } },
-  { MODKEY,              XK_s,       XK_y,      togglesp,       {.c = "ytmcmd" } },
+  { MODKEY|ShiftMask,    -1,         XK_Return, togglesp,       {.v = "spterm" } },
+  { MODKEY,              XK_s,       XK_f,      togglesp,       {.v = "splf" } },
+  { MODKEY,              XK_s,       XK_F9,     togglesp,       {.v = "spcalcu" } },
+  { MODKEY|ControlMask,  -1,         XK_v,      togglesp,       {.v = "spvol" } },
+  { MODKEY,              -1,         XK_g,      togglesp,       {.v = "sptop" } },
+  { MODKEY,              XK_s,       XK_n,      togglesp,       {.v = "spnote" } },
+  { MODKEY,              XK_s,       XK_d,      togglesp,       {.v = "dcmd" } },
+  { MODKEY,              XK_s,       XK_y,      togglesp,       {.v = "ytmcmd" } },
 
   { MODKEY,              XK_s,       XK_1,      togglesp,       {.ui = 1} }, 
   { MODKEY,              XK_s,       XK_2,      togglesp,       {.ui = 2} }, 
