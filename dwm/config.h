@@ -9,10 +9,10 @@ static const unsigned int snap         = 32;   /* snap pixel */
 static const int showbar               = 1;    /* 0 means no bar */
 static const int topbar                = 1;    /* 0 means bottom bar */
 static const int swallowfloating       = 0;    /* 1 means swallow floating windows by default */
-static const unsigned int gappih       = 15;   /* horiz inner gap between windows */
-static const unsigned int gappiv       = 15;   /* vert inner gap between windows */
-static const unsigned int gappoh       = 15;   /* horiz outer gap between windows and screen edge */
-static const unsigned int gappov       = 15;   /* vert outer gap between windows and screen edge */
+static const unsigned int gappih       = 0;   /* horiz inner gap between windows */
+static const unsigned int gappiv       = 0;   /* vert inner gap between windows */
+static const unsigned int gappoh       = 0;   /* horiz outer gap between windows and screen edge */
+static const unsigned int gappov       = 0;   /* vert outer gap between windows and screen edge */
 static const int smartgaps             = 0;    /* 1 means no outer gap when there is only one window */
 static const int user_bh               = 30;   /* user assigned bar height */
 static const int vertpad               = 0;    /* statusbar verical padding */
@@ -138,7 +138,7 @@ const char *spfm[] = {"st", "-n", "spfm", "-g", "110x33", "-e", "lfrun", NULL };
 const char *spbc[] = {"st", "-n", "spcalcu", "-g", "80x30", "-e", "bc", "-lq", NULL };
 const char *sppm[] = {"st", "-n", "spvol", "-g", "100x15", "-e", "pulsemixer", NULL };
 const char *sptop[] = {"st", "-n", "sptop", "-g", "115x35", "-e", "btop", NULL };
-const char *sporg[] = {"st", "-n", "spnote", "-g", "125x34", "-e", "nvim", "-c :call cursor(3,3)", "-c cd ~/personal/org", "/home/john/personal/org/index.org", NULL };
+const char *sporg[] = {"st", "-n", "spnote", "-g", "125x34", "-e", "nvim", "-c :call cursor(4,4)", "-c cd ~/personal/org", "/home/john/personal/org/index.org", NULL };
 
 /* alacritty cmd */
 /* const char *spcmd1[] = {"alacritty", "--class=spterm", "-o", "window.dimensions.columns=125", "window.dimensions.lines=34", NULL };
@@ -253,7 +253,7 @@ static Key keys[] = {
   { MODKEY,              -1,         XK_F10,    spawn,          SHCMD("playerctl play-pause") },
   { MODKEY,              -1,         XK_F11,    spawn,          SHCMD("playerctl previous") },
   { MODKEY,              -1,         XK_F12,    spawn,          SHCMD("playerctl next") },
-  { 0,                   -1,         XK_Print,  spawn,          SHCMD("screenshot") },
+  { MODKEY,              -1,         XK_Print,  spawn,          SHCMD("screenshot") },
   { 0,                   -1,         XF86XK_AudioPlay, spawn,   SHCMD("playerctl play-pause") },
   { 0,                   -1,         XF86XK_AudioNext, spawn,   SHCMD("playerctl next") },
 };
