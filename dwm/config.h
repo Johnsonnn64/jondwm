@@ -218,18 +218,22 @@ static Key keys[] = {
   { MODKEY|ShiftMask,    -1,         XK_h,      setcfact,       {.f = -0.20 } },
   { Mod4Mask|ShiftMask,  -1,         XK_h,      moveresize,     {.v = "0x 0y -25w 0h" } },
   { Mod4Mask,            -1,         XK_h,      moveresize,     {.v = "-25x 0y 0w 0h" } },
+  { Mod4Mask|ControlMask,-1,         XK_h,      moveend,        {.v = "w"}},
   { MODKEY,              -1,         XK_j,      focusstack,     {.i = +1 } },
   { MODKEY|ShiftMask,    -1,         XK_j,      movestack,      {.i = +1 } },
   { Mod4Mask|ShiftMask,  -1,         XK_j,      moveresize,     {.v = "0x 0y 0w 25h" } },
   { Mod4Mask,            -1,         XK_j,      moveresize,     {.v = "0x 25y 0w 0h" } },
+  { Mod4Mask|ControlMask,-1,         XK_j,      moveend,        {.v = "s"}},
   { MODKEY,              -1,         XK_k,      focusstack,     {.i = -1 } },
   { MODKEY|ShiftMask,    -1,         XK_k,      movestack,      {.i = -1 } },
   { Mod4Mask|ShiftMask,  -1,         XK_k,      moveresize,     {.v = "0x 0y 0w -25h" } },
   { Mod4Mask,            -1,         XK_k,      moveresize,     {.v = "0x -25y 0w 0h" } },
+  { Mod4Mask|ControlMask,-1,         XK_k,      moveend,        {.v = "n"}},
   { MODKEY,              -1,         XK_l,      setmfact,       {.f = +0.025 } },
   { MODKEY|ShiftMask,    -1,         XK_l,      setcfact,       {.f = +0.20 } },
   { Mod4Mask|ShiftMask,  -1,         XK_l,      moveresize,     {.v = "0x 0y 25w 0h" } },
   { Mod4Mask,            -1,         XK_l,      moveresize,     {.v = "25x 0y 0w 0h" } },
+  { Mod4Mask|ControlMask,-1,         XK_l,      moveend,        {.v = "e"}},
   { MODKEY,              -1,         XK_Return, zoom,           {0} },
 
   { MODKEY,              -1,         XK_b,      togglebar,      {0} },
@@ -256,6 +260,7 @@ static Key keys[] = {
   { MODKEY,              -1,         XK_Print,  spawn,          SHCMD("screenshot") },
   { 0,                   -1,         XF86XK_AudioPlay, spawn,   SHCMD("playerctl play-pause") },
   { 0,                   -1,         XF86XK_AudioNext, spawn,   SHCMD("playerctl next") },
+
 };
 
 /* button definitions */

@@ -218,6 +218,7 @@ static void manage(Window w, XWindowAttributes *wa);
 static void mappingnotify(XEvent *e);
 static void maprequest(XEvent *e);
 static void monocle(Monitor *m);
+static void moveend(const Arg *arg);
 static void moveresize(const Arg *arg);
 static void movemouse(const Arg *arg);
 static void movecenter(const Arg *arg);
@@ -1554,6 +1555,26 @@ movecenter(const Arg *arg)
 	selmon->sel->x = selmon->sel->mon->mx + (selmon->sel->mon->mw - WIDTH(selmon->sel)) / 2;
 	selmon->sel->y = selmon->sel->mon->my + (selmon->sel->mon->mh - HEIGHT(selmon->sel)) / 2;
 	arrange(selmon);
+}
+
+void
+moveend(const Arg *arg)
+{
+  Client *c = selmon->sel;
+
+  if (!c || !c->isfloating) 
+    return;
+  if (!strcmp(arg->v, "n")) {
+    c->y = 0 + bh;
+  } else if (!strcmp(arg->v, "s")) {
+    c->y = selmon->mh;
+  } else if (!strcmp(arg->v, "e")) {
+    c->x = selmon->mw;
+  } else if (!strcmp(arg->v, "w")) {
+    c->x = 0;
+  }
+
+  arrange(selmon);
 }
 
 void
