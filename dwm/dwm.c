@@ -1341,6 +1341,8 @@ killclient(const Arg *arg)
     return;
   if (selmon->sel->isfullscreen) { 
     restoreotherwins(arg);
+    if (!selmon->showbar)
+      togglebar(NULL);
   }
   if (!sendevent(selmon->sel, wmatom[WMDelete])) {
     XGrabServer(dpy);
