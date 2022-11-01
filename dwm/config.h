@@ -118,12 +118,14 @@ static char ms[12];
 #define DMENUS(NAME,CMD) \
   static const char *NAME[] = { CMD, "-x", ds, "-y", dv, "-z", ms, /* "-m", dmenumon, */ NULL };
 
-DMENUS(dmenucmd, "dmenu_run")
-DMENUS(clipcmd, "clipmenu")
-DMENUS(passcmd, "passmenu")
-DMENUS(mountcmd, "dmenumount")
-DMENUS(umountcmd, "dmenuumount")
-DMENUS(wikicmd, "wikimenu")
+//     cmd name    executable 
+DMENUS(dmenucmd,   "dmenu_run")
+DMENUS(clipcmd,    "clipmenu")
+DMENUS(passcmd,    "passmenu")
+DMENUS(mountcmd,   "dmenumount")
+DMENUS(umountcmd,  "dmenuumount")
+DMENUS(wikicmd,    "wikimenu")
+DMENUS(scrcmd,     "scrmenu")
 
 static const char *termcmd[]  = { "st", NULL };
 
