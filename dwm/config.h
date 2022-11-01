@@ -213,6 +213,7 @@ static Key keys[] = {
   { MODKEY|ControlMask,  -1,         XK_p,      spawn,          {.v = passcmd } },
 
   { MODKEY,              XK_c,       XK_s, 	    restorewin,     {0}},
+  { MODKEY|ControlMask,  -1,         XK_s, 	    spawn,          {.v = scrcmd } },
   { MODKEY,              -1,         XK_d,      incnmaster,     {.i = -1 } },
 	{ MODKEY,              -1,         XK_f,      togglefullscr,  {0} },
   { MODKEY,              -1,         XK_h,      setmfact,       {.f = -0.025 } },
