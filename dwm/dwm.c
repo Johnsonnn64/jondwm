@@ -1567,11 +1567,11 @@ moveend(const Arg *arg)
   if (!c || !c->isfloating) 
     return;
   if (!strcmp(arg->v, "n")) {
-    c->y = 0 + bh;
+    c->y = selmon->my + bh;
   } else if (!strcmp(arg->v, "s")) {
-    c->y = selmon->mh;
+    c->y = selmon->wy + selmon->wh;
   } else if (!strcmp(arg->v, "e")) {
-    c->x = selmon->mw;
+    c->x = selmon->wx + selmon->ww;
   } else if (!strcmp(arg->v, "w")) {
     c->x = 0;
   }
