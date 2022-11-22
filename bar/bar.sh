@@ -6,7 +6,7 @@
 interval=0
 
 # load colors
-. ~/workspace/suckless/dwm/scripts/catppuccin
+. ~/workspace/suckless/dwm/bar/catppuccin
 
 
 #cpu() {
