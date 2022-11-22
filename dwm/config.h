@@ -240,6 +240,7 @@ static Key keys[] = {
   { MODKEY,              -1,         XK_Return, zoom,           {0} },
 
   { MODKEY,              -1,         XK_b,      togglebar,      {0} },
+  { MODKEY|ShiftMask,    -1,         XK_b,      spawn,          SHCMD("bookmarks") },
   { MODKEY|ControlMask,  -1,         XK_b,      spawn,          SHCMD("bluetoothdmenu.sh") },
   { MODKEY,              -1,         XK_n,      spawn,          SHCMD("st nvim") },
   { MODKEY,              -1,         XK_m,      setlayout,      {.v = &layouts[1]} },
