@@ -127,7 +127,7 @@ DMENUS(umountcmd,  "dmenuumount")
 DMENUS(wikicmd,    "wikimenu")
 DMENUS(scrcmd,     "scrmenu")
 
-static const char *termcmd[]  = { "st", NULL };
+static const char *termcmd[]  = { "alacritty", NULL };
 
 typedef struct {
   char *rule;
@@ -135,21 +135,20 @@ typedef struct {
 } Sp;
 
 /* st cmds */
-const char *spterm[] = {"st", "-n", "spterm", "-g", "125x34", NULL };
+/* const char *spterm[] = {"st", "-n", "spterm", "-g", "125x34", NULL };
 const char *spfm[] = {"st", "-n", "spfm", "-g", "110x33", "-e", "lfrun", NULL };
 const char *spbc[] = {"st", "-n", "spcalcu", "-g", "80x30", "-e", "bc", "-lq", NULL };
 const char *sppm[] = {"st", "-n", "spvol", "-g", "100x15", "-e", "pulsemixer", NULL };
 const char *sptop[] = {"st", "-n", "sptop", "-g", "115x35", "-e", "btop", NULL };
-const char *sporg[] = {"st", "-n", "spnote", "-g", "125x34", "-e", "nvim", "-c :call cursor(4,4)", "-c cd ~/personal/org", "/home/john/personal/org/index.org", NULL };
+const char *sporg[] = {"st", "-n", "spnote", "-g", "125x34", "-e", "nvim", "-c :call cursor(4,4)", "-c cd ~/personal/org", "/home/john/personal/org/index.org", NULL }; */
 
 /* alacritty cmd */
-/* const char *spcmd1[] = {"alacritty", "--class=spterm", "-o", "window.dimensions.columns=125", "window.dimensions.lines=34", NULL };
-const char *spcmd2[] = {"alacritty", "--class=spfm", "-o", "window.dimensions.columns=110", "window.dimensions.lines=33", "-e", "lfrun", NULL };
-const char *spcmd3[] = {"alacritty", "--class=spcalcu", "-o", "window.dimensions.columns=80", "window.dimensions.lines=30", "-e", "bc", "-lq", NULL };
-const char *spcmd4[] = {"alacritty", "--class=spvol", "-o", "window.dimensions.columns=100", "window.dimensions.lines=15", "-e", "pulsemixer", NULL };
-const char *spcmd5[] = {"alacritty", "--class=sptop", "-o", "window.dimensions.columns=115", "window.dimensions.lines=35", "-e", "btop", NULL };
-const char *spcmd6[] = {"alacritty", "--class=spcurse" "-o", "window.dimensions.columns=100", "window.dimensions.lines=30", "-e", "calcurse", NULL };
-const char *spcmd7[] = {"alacritty", "--class=spnote", "-o", "window.dimensions.columns=125", "window.dimensions.lines=34", "-e", "nvim", "+3", "-c", "cd ~/personal/org", "/home/john/personal/org/index.org", NULL }; */
+const char *spterm[] = {"alacritty", "--class=spterm", "-o", "window.dimensions.columns=125", "window.dimensions.lines=34", NULL };
+const char *spfm[] = {"alacritty", "--class=spfm", "-o", "window.dimensions.columns=110", "window.dimensions.lines=33", "-e", "lfrun", NULL };
+const char *spbc[] = {"alacritty", "--class=spcalcu", "-o", "window.dimensions.columns=80", "window.dimensions.lines=30", "-e", "bc", "-lq", NULL };
+const char *sppm[] = {"alacritty", "--class=spvol", "-o", "window.dimensions.columns=100", "window.dimensions.lines=15", "-e", "pulsemixer", NULL };
+const char *sptop[] = {"alacritty", "--class=sptop", "-o", "window.dimensions.columns=115", "window.dimensions.lines=35", "-e", "btop", NULL };
+const char *sporg[] = {"alacritty", "--class=spnote", "-o", "window.dimensions.columns=125", "window.dimensions.lines=34", "-e", "nvim", "+3", "-c", "cd ~/personal/org", "/home/john/personal/org/index.org", NULL };
 
 const char *dcmd[] = {"discocss", NULL };
 const char *ytmcmd[] = {"youtube-music", NULL };
@@ -242,7 +241,7 @@ static Key keys[] = {
   { MODKEY,              -1,         XK_b,      togglebar,      {0} },
   { MODKEY|ShiftMask,    -1,         XK_b,      spawn,          SHCMD("bookmarks") },
   { MODKEY|ControlMask,  -1,         XK_b,      spawn,          SHCMD("bluetoothdmenu.sh") },
-  { MODKEY,              -1,         XK_n,      spawn,          SHCMD("st nvim") },
+  { MODKEY,              -1,         XK_n,      spawn,          SHCMD("alacritty -e nvim") },
   { MODKEY,              -1,         XK_m,      setlayout,      {.v = &layouts[1]} },
   { Mod4Mask,            -1,         XK_m,      movecenter,     {0} },
   { MODKEY,              -1,         XK_comma,  focusnthmon,    {.i = 0 } },
