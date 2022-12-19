@@ -277,6 +277,7 @@ static void toggleview(const Arg *arg);
 static void hidewin(const Arg *arg);
 static void restorewin(const Arg *arg);
 static void hideotherwins(const Arg *arg);
+static void removesp(const Arg *arg);
 static void restoreotherwins(const Arg *arg);
 static void restoreclientwin(Client *c);
 static void unfocus(Client *c, int setfocus);
@@ -2712,6 +2713,12 @@ void hideotherwins(const Arg *arg) {
       hiddenWinStack[++hiddenWinStackTop] = i;
     }
   }
+}
+
+void removesp(const Arg *arg) {
+  Client *c = selmon->sel;
+  if (!c->spnew) return;
+  c->spnew = 0;
 }
 
 void restoreotherwins(const Arg *arg) {

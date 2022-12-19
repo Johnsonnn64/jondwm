@@ -189,6 +189,7 @@ static Key keys[] = {
   { MODKEY,              XK_s,       XK_8,      togglesp,       {.ui = 8} }, 
   { MODKEY,              XK_s,       XK_9,      togglesp,       {.ui = 9} }, 
   { MODKEY,              XK_s,       XK_0,      togglesp,       {.ui = 10} }, 
+  { MODKEY,              XK_s,       XK_BackSpace, removesp,    {0} },
 
   { MODKEY,              -1,         XK_grave,  view,           {.ui = ~0 } },
   { MODKEY|ShiftMask,    -1,         XK_grave,  tag,            {.ui = ~0 } },
