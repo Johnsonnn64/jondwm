@@ -19,9 +19,10 @@ static const int focusonwheel       = 1;    /* click on focus with mousewheel */
 
 #include "catppuccin.h"
 
-// static const char *fonts[]             = { "JetBrainsMono Nerd Font:style=Medium:size=9:antialias=true",
-static const char *fonts[]                = { "Symbols Nerd Font Mono:style=2049-em:size=11",
-                                              "Iosevka Nerd Font:style=Medium:size=12:antialias=true" };
+static const char *fonts[]             = { "JetBrainsMono Nerd Font:style=Medium:size=10:antialias=true", 
+                                           "Symbols Nerd Font Mono:style=2049-em:size=11" };
+/* static const char *fonts[]                = { "Symbols Nerd Font Mono:style=2049-em:size=11",
+                                              "Iosevka Nerd Font:style=Medium:size=12:antialias=true" }; */
 
 static const char *colors[][3]      = {
 	/*                     fg               bg         border   */
