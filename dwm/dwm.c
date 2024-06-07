@@ -195,7 +195,7 @@ static Monitor *numtomon(int num);
 static void detectfullscr(Client *c, char *opt);
 static void drawbar(Monitor *m);
 static void drawbars(void);
-static int drawstatusbar(Monitor *m, int bh, char* text);
+static void drawstatusbar(Monitor *m, int bh, char* text);
 static void expose(XEvent *e);
 static void focus(Client *c);
 static void focusin(XEvent *e);
@@ -878,7 +878,7 @@ dirtomon(int dir)
 	return m;
 } */
 
-int
+void
 drawstatusbar(Monitor *m, int bh, char* stext) {
 	int ret, i, w, x, len;
 	short isCode = 0;
@@ -918,7 +918,8 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
 
 	w += 2; /* 1px padding on both sides */
 	ret = m->ww - w;
-	x = m->ww - w - 2 * sp;
+	// x = m->ww - w - 2 * sp;
+  x = 0;
 
 	drw_setscheme(drw, scheme[LENGTH(colors)]);
 	drw->scheme[ColFg] = scheme[SchemeNorm][ColFg];
@@ -964,7 +965,7 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
 					while (text[++i] != ',');
 					int rh = atoi(text + ++i);
 
-					drw_rect(drw, rx + x, ry, rw, rh, 1, 0);
+					// drw_rect(drw, rx + x, ry, rw, rh, 0, 0);
 				} else if (text[i] == 'f') {
 					x += atoi(text + ++i);
 				}
@@ -983,8 +984,6 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
 
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	free(p);
-
-	return ret;
 }
 
 Monitor *
@@ -1018,14 +1017,17 @@ detectfullscr(Client *c, char *opt)
 void
 drawbar(Monitor *m)
 {
-	int x, w, tw = 0;
+	int x, w = 0;
 	unsigned int i, occ = 0, urg = 0;
 	Client *c;
 
   if (!m->showbar)
     return;
 
-  tw = m->ww - drawstatusbar(m, bh, stext);
+  drw_setscheme(drw, scheme[SchemeNorm]);
+  drw_rect(drw, 0, 0, m->ww - sp * 2, bh, 1, 1);
+
+  drawstatusbar(m, bh, stext);
 
   for (c = m->clients; c; c = c->next) {
     occ |= c->tags;
