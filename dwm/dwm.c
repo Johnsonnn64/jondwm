@@ -567,7 +567,7 @@ unswallow(Client *c)
 void
 buttonpress(XEvent *e)
 {
-	unsigned int i, x, click;
+	unsigned int i, x, w, click;
 	Arg arg = {0};
 	Client *c;
 	Monitor *m;
@@ -582,14 +582,19 @@ buttonpress(XEvent *e)
 		focus(NULL);
 	}
 	if (ev->window == selmon->barwin) {
-		i = x = 0;
+		i = x = w = 0;
+    for (i = 0; i < LENGTH(tags); i++) {
+      w += TEXTW(tags[i]);
+    };
+    x = (m->ww - w)/2 - sp;
+    i = 0;
 		do
 			x += TEXTW(tags[i]);
 		while (ev->x >= x && ++i < LENGTH(tags));
-		if (i < LENGTH(tags)) {
+		if (i < LENGTH(tags) && ev->x >= (m->ww - w)/2 - sp) {
 			click = ClkTagBar;
 			arg.ui = 1 << i;
-		} else if (ev->x < x + TEXTW(selmon->ltsymbol))
+		} else if (ev->x < x + TEXTW(selmon->ltsymbol) && ev->x >= (m->ww - w)/2 - sp)
 			click = ClkLtSymbol;
 		else
 			click = ClkStatusText;
@@ -1019,7 +1024,11 @@ drawbar(Monitor *m)
     if (c->isurgent)
       urg |= c->tags;
   }
-  x = 0;
+  w = 0;
+  for (i = 0; i < LENGTH(tags); i++) {
+    w += TEXTW(tags[i]) ;
+  };
+  x = (m->ww - w - TEXTW(m->ltsymbol))/2 ;
   for (i = 0; i < LENGTH(tags); i++) {
     w = TEXTW(tags[i]);
     drw_setscheme(drw, scheme[occ & 1 << i ? tagschemes[i] : SchemeTag]);
