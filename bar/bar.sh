@@ -94,8 +94,8 @@ clock() {
 
 while true; do
 
-  [ $interval = 0 ] || [ $(($interval % 5)) = 0 ] && wlan=$(wlan) && mem=$(mem) battery=$(battery) && brightness=$(brightness) && clock=$(clock)
+  [ $interval = 0 ] || [ $(($interval % 5)) = 0 ] && wlan=$(wlan) && mem=$(mem) battery=$(battery) && brightness=$(brightness)
 	interval=$((interval + 1))
 
-  sleep 0.2 && xsetroot -name "$(echo "$wlan  $mem  $battery $brightness $(volume)  $clock  " | sed 's/   */  /g')"
+  sleep 0.2 && xsetroot -name "$(echo "$wlan  $mem  $battery $brightness $(volume) " | sed 's/   */  /g')"
 done
