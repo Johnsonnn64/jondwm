@@ -948,16 +948,6 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
 				} else if (text[i] == 'd') {
 					drw->scheme[ColFg] = scheme[SchemeNorm][ColFg];
 					drw->scheme[ColBg] = scheme[SchemeNorm][ColBg];
-				// } else if (text[i] == 'r') {
-					// int rx = atoi(text + ++i);
-					// while (text[++i] != ',');
-					// int ry = atoi(text + ++i);
-					// while (text[++i] != ',');
-					// int rw = atoi(text + ++i);
-					// while (text[++i] != ',');
-					// int rh = atoi(text + ++i);
-
-					// // drw_rect(drw, rx + x, ry, rw, rh, 0, 0);
 				} else if (text[i] == 'f') {
 					x += atoi(text + ++i);
 				}
