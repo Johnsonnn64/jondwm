@@ -2409,16 +2409,21 @@ sigterm(int unused)
 void
 spawn(const Arg *arg)
 {
-  // int size = selmon->ww - sidepad *2;
-  sprintf(ms, "%d", selmon->ww - sidepad * 2);
-  sprintf(ds, "%d", sidepad);
-  sprintf(dv, "%d", vertpad);
+  if (selmon->sellt == 1) {   // if layout is monocle 
+    sprintf(ds, "%d", 0);
+    sprintf(dv, "%d", 0);
+    sprintf(ms, "%d", selmon->ww);
+  } else {
+    sprintf(ds, "%d", sidepad);
+    sprintf(dv, "%d", vertpad);
+    sprintf(ms, "%d", selmon->ww - sidepad * 2);
+  }
   sprintf(dh, "%d", bh);
-	if (fork() == 0) {
-		if (dpy)
-			close(ConnectionNumber(dpy));
-		setsid();
-		execvp(((char **)arg->v)[0], (char **)arg->v);
+  if (fork() == 0) {
+    if (dpy)
+      close(ConnectionNumber(dpy));
+    setsid();
+    execvp(((char **)arg->v)[0], (char **)arg->v);
 		die("dwm: execvp '%s' failed:", ((char **)arg->v)[0]);
 	}
 }

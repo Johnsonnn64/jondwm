@@ -153,6 +153,7 @@ DMENUS(umountcmd,  "dmenuumount")
 DMENUS(wikicmd,    "wikimenu")
 DMENUS(scrcmd,     "scrmenu")
 DMENUS(powermenu,  "power.sh")
+DMENUS(btmenu,     "bluetoothdmenu.sh")
 
 /* commands */
 static const char *termcmd[]  = { "alacritty", NULL };
@@ -187,8 +188,8 @@ static const Key keys[] = {
   { MODKEY,                     -1,  XK_r,      spawn,          {.v = termcmd } },
   { MODKEY|ControlMask,         -1,  XK_s, 	    spawn,          {.v = scrcmd } },
   { MODKEY|ControlMask,         -1,  XK_p,      spawn,          {.v = powermenu } },
-  { MODKEY|ShiftMask,           -1,  XK_b,      spawn,          SHCMD("bookmarks") },
-  { MODKEY|ControlMask,         -1,  XK_b,      spawn,          SHCMD("bluetoothdmenu.sh") },
+  // { MODKEY|ShiftMask,           -1,  XK_b,      spawn,          SHCMD("bookmarks") },
+  { MODKEY|ControlMask,         -1,  XK_b,      spawn,          {.v = btmenu } },
   { MODKEY,                     -1,  XK_n,      spawn,          SHCMD("alacritty -e nvim") },
 	{ MODKEY,                     -1,  XK_b,      togglebar,      {0} },
 	{ MODKEY,                     -1,  XK_j,      focusstack,     {.i = +1 } },
