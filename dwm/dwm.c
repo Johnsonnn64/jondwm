@@ -918,13 +918,11 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
 
 	w += 2; /* 1px padding on both sides */
 	ret = m->ww - w;
-	// x = m->ww - w - 2 * sp;
   x = 0;
 
-	drw_setscheme(drw, scheme[LENGTH(colors)]);
-	drw->scheme[ColFg] = scheme[SchemeNorm][ColFg];
-	drw->scheme[ColBg] = scheme[SchemeNorm][ColBg];
-	drw_rect(drw, x, 0, w, bh, 1, 1);
+	// drw_setscheme(drw, scheme[LENGTH(colors)]);
+	// drw->scheme[ColFg] = scheme[SchemeNorm][ColFg];
+	// drw->scheme[ColBg] = scheme[SchemeNorm][ColBg];
 	x++;
 
 	/* process status text */
