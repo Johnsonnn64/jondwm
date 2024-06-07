@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h> // for clock
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <X11/cursorfont.h>
@@ -333,6 +334,13 @@ static Drw *drw;
 static Monitor *mons, *selmon;
 static Window root, wmcheckwin;
 static KeySym keychain = -1;
+static char date[128];
+static char wday[7][4] = {
+  "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+};
+static char mon[12][4] = {
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+};
 
 #define hiddenWinStackMax 100
 static int hiddenWinStackTop = -1;
@@ -1042,6 +1050,20 @@ drawbar(Monitor *m)
   x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 
   drw_setscheme(drw, scheme[SchemeNorm]);
+
+  time_t rawtime;
+  struct tm * timeinfo;
+  time(&rawtime);
+  timeinfo = localtime(&rawtime);
+
+  sprintf(date, "  %s, %s %d 󱑆 %02d:%02d:%02d", wday[timeinfo->tm_wday],
+          mon[timeinfo->tm_mon], timeinfo->tm_mday, timeinfo->tm_hour, 
+          timeinfo->tm_min, timeinfo->tm_sec);
+  w = TEXTW(date);
+	x = m->ww - w - 2 * sp;
+  drw_setscheme(drw, scheme[SchemeTag6]);
+  drw_text(drw, x, 0, w, bh, lrpad / 2, date , 0);
+
 	drw_map(drw, m->barwin, 0, 0, m->ww, bh);
 }
 
