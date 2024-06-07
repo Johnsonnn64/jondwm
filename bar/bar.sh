@@ -36,7 +36,7 @@ battery() {
     reset=$(cat "$read")
 
     if [ "$ac_state" -eq 1 ]; then
-      printf "^c$green^ $get_capacity"
+      printf "^c$green^  $get_capacity"
       echo "1" > "$read"
     else
       if [ "$get_capacity" -le 15 ]; then
@@ -44,9 +44,9 @@ battery() {
           notify-send -u critical "Low Battery!" "Please Charge"
           echo "0" > "$read"
         fi
-        printf "^c$red^ $get_capacity"
+        printf "^c$red^  $get_capacity"
       else
-        printf "^c$yellow^ $get_capacity"
+        printf "^c$yellow^  $get_capacity"
         echo "1" > "$read"
       fi
     fi
@@ -62,7 +62,7 @@ brightness() {
 }
 
 mem() {
-	printf "^c$green^󰆼"
+	printf "^c$green^ 󰆼"
 	printf "^c$green^ $(free -h | awk '/^Mem/ { print $3 }' | sed s/i//g)"
 }
 
