@@ -880,7 +880,7 @@ dirtomon(int dir)
 
 void
 drawstatusbar(Monitor *m, int bh, char* stext) {
-	int ret, i, w, x, len;
+	int i, w, x, len;
 	short isCode = 0;
 	char *text;
 	char *p;
@@ -917,13 +917,7 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
 	text = p;
 
 	w += 2; /* 1px padding on both sides */
-	ret = m->ww - w;
   x = 0;
-
-	// drw_setscheme(drw, scheme[LENGTH(colors)]);
-	// drw->scheme[ColFg] = scheme[SchemeNorm][ColFg];
-	// drw->scheme[ColBg] = scheme[SchemeNorm][ColBg];
-	x++;
 
 	/* process status text */
 	i = -1;
@@ -954,16 +948,16 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
 				} else if (text[i] == 'd') {
 					drw->scheme[ColFg] = scheme[SchemeNorm][ColFg];
 					drw->scheme[ColBg] = scheme[SchemeNorm][ColBg];
-				} else if (text[i] == 'r') {
-					int rx = atoi(text + ++i);
-					while (text[++i] != ',');
-					int ry = atoi(text + ++i);
-					while (text[++i] != ',');
-					int rw = atoi(text + ++i);
-					while (text[++i] != ',');
-					int rh = atoi(text + ++i);
+				// } else if (text[i] == 'r') {
+					// int rx = atoi(text + ++i);
+					// while (text[++i] != ',');
+					// int ry = atoi(text + ++i);
+					// while (text[++i] != ',');
+					// int rw = atoi(text + ++i);
+					// while (text[++i] != ',');
+					// int rh = atoi(text + ++i);
 
-					// drw_rect(drw, rx + x, ry, rw, rh, 0, 0);
+					// // drw_rect(drw, rx + x, ry, rw, rh, 0, 0);
 				} else if (text[i] == 'f') {
 					x += atoi(text + ++i);
 				}
