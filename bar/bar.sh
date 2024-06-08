@@ -80,7 +80,7 @@ volume() {
   if [ yes = "$mute" ]; then
     printf "^$red^  muted" 
   else
-    printf "^c$green^ "
+    printf "^c$green^  "
     printf "^c$green^ $(pactl get-sink-volume @DEFAULT_SINK@ | awk '{print $5}')%"
   fi
 }
