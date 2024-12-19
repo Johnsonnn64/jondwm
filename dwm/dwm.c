@@ -3312,6 +3312,10 @@ centeredmaster(Monitor *m)
 	int mrest = 0, lrest = 0, rrest = 0;
 	Client *c;
 
+  sp = sidepad;
+  updatebarpos(m);
+  XMoveResizeWindow(dpy, m->barwin, m->wx + sp, m->by + vp, m->ww -  2 * sp, bh);
+
 	getgaps(m, &oh, &ov, &ih, &iv, &n);
 	if (n == 0)
 		return;
@@ -3394,6 +3398,10 @@ centeredfloatingmaster(Monitor *m)
 	int mx = 0, my = 0, mh = 0, mw = 0;
 	int sx = 0, sy = 0, sh = 0, sw = 0;
 	Client *c;
+
+  sp = sidepad;
+  updatebarpos(m);
+  XMoveResizeWindow(dpy, m->barwin, m->wx + sp, m->by + vp, m->ww -  2 * sp, bh);
 
 	getgaps(m, &oh, &ov, &ih, &iv, &n);
 	if (n == 0)
