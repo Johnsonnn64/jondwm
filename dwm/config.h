@@ -91,9 +91,11 @@ static const LayoutMonitorRule lm_rules[] = {
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-	{ "󰊠",      tile },    /* first entry is default */
+	{ "󰊠",        tile },    /* first entry is default */
 	{ "><>",      NULL },    /* no layout function means floating behavior */
 	{ "[M]",      monocle },
+	{ "|M|",      centeredmaster },
+	{ ">M>",      centeredfloatingmaster },
 };
 
 typedef struct {
@@ -217,6 +219,8 @@ static const Key keys[] = {
 	{ MODKEY,                     -1,  XK_y,      incrihgaps,     {.i = +1 } },
 	{ MODKEY,                     -1,  XK_o,      incrihgaps,     {.i = -1 } },
 	{ MODKEY|ControlMask,         -1,  XK_y,      incrivgaps,     {.i = +1 } },
+	{ MODKEY,                     -1,  XK_u,      setlayout,      {.v = &layouts[3]} },
+	{ MODKEY,                     -1,  XK_o,      setlayout,      {.v = &layouts[4]} },
   { Mod4Mask,                   -1,  XK_m,      movecenter,     {0} },
 	{ MODKEY|ControlMask,         -1,  XK_o,      incrivgaps,     {.i = -1 } },
 	{ MODKEY|Mod4Mask,            -1,  XK_y,      incrohgaps,     {.i = +1 } },
