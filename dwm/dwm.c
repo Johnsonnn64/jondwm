@@ -299,7 +299,6 @@ static int xerror(Display *dpy, XErrorEvent *ee);
 static int xerrordummy(Display *dpy, XErrorEvent *ee);
 static int xerrorstart(Display *dpy, XErrorEvent *ee);
 static void zoom(const Arg *arg);
-
 static void centeredmaster(Monitor *m);
 static void centeredfloatingmaster(Monitor *m);
 static void getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int *nc);
@@ -3338,7 +3337,7 @@ centeredmaster(Monitor *m)
 			mx += lw + iv;
 		} else {
 			/* ||<---M--->|<-S->|| */
-			mw = (mw - iv) * m->mfact;
+			mw = (mw + iv) * m->mfact; // same behavior as tiled when 2 clients (was not centered properly)
 			lw = 0;
 			rw = m->ww - mw - iv - 2*ov;
 		}
@@ -3346,7 +3345,7 @@ centeredmaster(Monitor *m)
 		ly = m->wy + oh;
 		rx = mx + mw + iv;
 		ry = m->wy + oh;
-	}
+  }
 
 	/* calculate facts */
 	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++) {
