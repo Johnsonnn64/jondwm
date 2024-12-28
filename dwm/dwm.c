@@ -3455,9 +3455,6 @@ getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int *nc)
 	Client *c;
 
 	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
-	if (n == 1) {
-		oe = 0; // outer gaps disabled when only one client
-	}
 
 	*oh = m->gappoh*oe; // outer horizontal gap
 	*ov = m->gappov*oe; // outer vertical gap
