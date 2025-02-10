@@ -74,7 +74,7 @@ static const Rule rules[] = {
   { NULL,		         "sptop",   NULL,	          0,	 1,       1,			 0,       0,     -1, 4  },
   { NULL,		         "spnote",  NULL,	          0,	 1,       1,			 0,       0,     -1, 5  },
   { "discord",       NULL,      NULL,           0,   1,       1,       0,       0,     -1, 6  },
-  { "YouTube Music", NULL,      NULL,           0,   1,       1,       0,       0,     -1, 7  },
+  { "com.github.th_ch.youtube_music", NULL,      NULL,           0,   1,       1,       0,       0,     -1, 7  },
 };
 
 /* layout(s) */
