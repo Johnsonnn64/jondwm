@@ -119,7 +119,8 @@ struct Client {
 
 typedef struct {
 	unsigned int mod;
-    KeySym chain;
+  int cs; 
+  KeySym chain;
 	KeySym keysym;
 	void (*func)(const Arg *);
 	const Arg arg;
@@ -177,6 +178,11 @@ typedef struct {
   int spnum;
 } Rule;
 
+typedef struct {
+  const char *class;
+  const char *instance;
+} ClientSpecific;
+
 /* function declarations */
 static void applylmrules(void);
 static void applyrules(Client *c);
@@ -215,6 +221,7 @@ static int getrootptr(int *x, int *y);
 static long getstate(Window w);
 static int gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, int focused);
+static void csgrabkeys(Client *c);
 static void grabkeys(void);
 static void hide(Client *c);
 static void hidewin(const Arg *arg);
@@ -1139,6 +1146,7 @@ focus(Client *c)
 	}
 	selmon->sel = c;
 	drawbars();
+  csgrabkeys(c);
 }
 
 /* there are some broken focus acquiring clients needing extra handling */
@@ -1327,6 +1335,41 @@ grabkeys(void)
 } */
 
 void
+csgrabkeys(Client *c)
+{
+  updatenumlockmask();
+  {
+		unsigned int i,j;
+		unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
+		KeyCode code;
+    const ClientSpecific *clsp;
+    
+    const char *class, *instance;
+    XClassHint ch = { NULL, NULL };
+
+    if (c) {
+      XGetClassHint(dpy, c->win, &ch);
+    } 
+    class    = ch.res_class ? ch.res_class : broken;
+    instance = ch.res_name  ? ch.res_name  : broken;
+
+    for (i = 0; i < LENGTH(keys); i ++) {
+      clsp = &cs[keys[i].cs];
+      if (keys[i].cs > 0 
+          && (!clsp->class || strstr(class, clsp->class)) && (!clsp->instance || strstr(instance, clsp->instance)) 
+          && (code = XKeysymToKeycode(dpy, keys[i].keysym))) {
+        for (j = 0; j < LENGTH(modifiers); j++)
+          XGrabKey(dpy, code, keys[i].mod | modifiers[j], root, True, GrabModeAsync, GrabModeAsync);
+      }
+    }
+    if (ch.res_class)
+      XFree(ch.res_class);
+    if (ch.res_name)
+      XFree(ch.res_name);
+  }
+}
+
+void
 grabkeys(void)
 {
 	updatenumlockmask();
@@ -1336,17 +1379,18 @@ grabkeys(void)
 		KeyCode code;
 		KeyCode chain;
 
-		XUngrabKey(dpy, AnyKey, AnyModifier, root);
-		for (i = 0; i < LENGTH(keys); i++)
-			if ((code = XKeysymToKeycode(dpy, keys[i].keysym))) {
-				if (keys[i].chain != -1 &&
-					((chain = XKeysymToKeycode(dpy, keys[i].chain))))
-						code = chain;
-				for (j = 0; j < LENGTH(modifiers); j++)
-					XGrabKey(dpy, code, keys[i].mod | modifiers[j], root,
-						True, GrabModeAsync, GrabModeAsync);
-			}
-	}
+    XUngrabKey(dpy, AnyKey, AnyModifier, root);
+
+    for (i = 0; i < LENGTH(keys); i++) {
+        if ((code = XKeysymToKeycode(dpy, keys[i].keysym)) && keys[i].cs == 0) {
+          if (keys[i].chain != -1 && ((chain = XKeysymToKeycode(dpy, keys[i].chain))))
+            code = chain;
+          for (j = 0; j < LENGTH(modifiers); j++)
+            XGrabKey(dpy, code, keys[i].mod | modifiers[j], root,
+                     True, GrabModeAsync, GrabModeAsync);
+        }
+    }
+  }
 }
 
 void
@@ -1426,29 +1470,23 @@ keypress(XEvent *e)
 
 	ev = &e->xkey;
 	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
-	for (i = 0; i < LENGTH(keys); i++) {
-		if (keysym == keys[i].keysym && keys[i].chain == -1
-				&& CLEANMASK(keys[i].mod) == CLEANMASK(ev->state)
-				&& keys[i].func)
-			keys[i].func(&(keys[i].arg));
-		else if (keysym == keys[i].chain && keychain == -1
-				&& CLEANMASK(keys[i].mod) == CLEANMASK(ev->state)
-				&& keys[i].func) {
-			current = 1;
-			keychain = keysym;
-			for (j = 0; j < LENGTH(modifiers); j++)
-				XGrabKey(dpy, AnyKey, 0 | modifiers[j], root,
-						True, GrabModeAsync, GrabModeAsync);
-		} else if (!current && keysym == keys[i].keysym
-				&& keychain != -1
-				&& keys[i].chain == keychain
-				&& keys[i].func)
-			keys[i].func(&(keys[i].arg));
-	}
-	if (!current) {
-		keychain = -1;
-		grabkeys();
-	}
+  for (i = 0; i < LENGTH(keys); i++) {
+    if (keysym == keys[i].keysym && keys[i].chain == -1 && CLEANMASK(keys[i].mod) == CLEANMASK(ev->state) && keys[i].func)
+      keys[i].func(&(keys[i].arg));
+    else if (keysym == keys[i].chain && keychain == -1 && CLEANMASK(keys[i].mod) == CLEANMASK(ev->state) && keys[i].func) {
+      current = 1;
+      keychain = keysym;
+      for (j = 0; j < LENGTH(modifiers); j++)
+        XGrabKey(dpy, AnyKey, 0 | modifiers[j], root, True, GrabModeAsync, GrabModeAsync);
+    } else if (!current && keysym == keys[i].keysym && keychain != -1 && keys[i].chain == keychain && keys[i].func) {
+      keys[i].func(&(keys[i].arg));
+    }
+  }
+  if (!current) {
+    keychain = -1;
+    grabkeys();
+  }
+  focus(NULL);
 }
 
 void
@@ -2386,6 +2424,7 @@ setup(void)
   /* init bars */
 	updatebars();
 	updatestatus();
+	applylmrules();
 	/* supporting window for NetWMCheck */
 	wmcheckwin = XCreateSimpleWindow(dpy, root, 0, 0, 1, 1, 0, 0, 0);
 	XChangeProperty(dpy, wmcheckwin, netatom[NetWMCheck], XA_WINDOW, 32,
@@ -2408,7 +2447,6 @@ setup(void)
 	XSelectInput(dpy, root, wa.event_mask);
 	grabkeys();
 	focus(NULL);
-	applylmrules();
 }
 
 void
