@@ -224,7 +224,7 @@ static void grabbuttons(Client *c, int focused);
 static void csgrabkeys(Client *c);
 static void grabkeys(void);
 static void hide(Client *c);
-static void hidewin(const Arg *arg);
+// static void hidewin(const Arg *arg);
 static void hideotherwins(Client *c);
 static void incnmaster(const Arg *arg);
 static void keypress(XEvent *e);
@@ -246,8 +246,8 @@ static void resize(Client *c, int x, int y, int w, int h, int interact);
 static void resizeclient(Client *c, int x, int y, int w, int h);
 static void resizemouse(const Arg *arg);
 static void restack(Monitor *m);
-static void restoreclientwin(Client *c);
-static void restorewin(const Arg *arg);
+// static void restoreclientwin(Client *c);
+// static void restorewin(const Arg *arg);
 static void restoreotherwins(const Arg *arg);
 static void run(void);
 static void scan(void);
@@ -257,16 +257,16 @@ static void setclientstate(Client *c, long state);
 static void setclienttagprop(Client *c);
 static void setfocus(Client *c);
 static void setfullscreen(Client *c, int fullscreen);
-static void setgaps(int oh, int ov, int ih, int iv);
-static void incrgaps(const Arg *arg);
-static void incrigaps(const Arg *arg);
-static void incrogaps(const Arg *arg);
-static void incrohgaps(const Arg *arg);
-static void incrovgaps(const Arg *arg);
-static void incrihgaps(const Arg *arg);
-static void incrivgaps(const Arg *arg);
-static void togglegaps(const Arg *arg);
-static void defaultgaps(const Arg *arg);
+// static void setgaps(int oh, int ov, int ih, int iv);
+// static void incrgaps(const Arg *arg)
+// static void incrigaps(const Arg *arg);
+// static void incrogaps(const Arg *arg);
+// static void incrohgaps(const Arg *arg);
+// static void incrovgaps(const Arg *arg);
+// static void incrihgaps(const Arg *arg);
+// static void incrivgaps(const Arg *arg);
+// static void togglegaps(const Arg *arg);
+// static void defaultgaps(const Arg *arg);
 static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
 static void setup(void);
@@ -310,7 +310,6 @@ static void centeredmaster(Monitor *m);
 static void centeredfloatingmaster(Monitor *m);
 static void getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int *nc);
 static void getfacts(Monitor *m, int msize, int ssize, float *mf, float *sf, int *mr, int *sr);
-static void setgaps(int oh, int ov, int ih, int iv);
 static pid_t getparentprocess(pid_t p);
 static int isdescprocess(pid_t p, pid_t c);
 static Client *swallowingclient(Window w);
@@ -1418,14 +1417,14 @@ hide(Client *c) {
 	arrange(c->mon);
 }
 
-void
-hidewin(const Arg *arg) {
-  if (!selmon->sel)
-    return;
-  Client *c = (Client *)selmon->sel;
-  hide(c);
-  hiddenWinStack[++hiddenWinStackTop] = c;
-}
+// void
+// hidewin(const Arg *arg) {
+//   if (!selmon->sel)
+//     return;
+//   Client *c = (Client *)selmon->sel;
+//   hide(c);
+//   hiddenWinStack[++hiddenWinStackTop] = c;
+// }
 
 void
 hideotherwins(Client *c) {
@@ -2047,39 +2046,39 @@ restack(Monitor *m)
 	while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
-void 
-restoreclientwin(Client *c) {
-  int i;
-  for (i = 0; i <= hiddenWinStackTop; ++i) {
-    if (HIDDEN(hiddenWinStack[i]) && hiddenWinStack[i]->tags == c->tags) {
-      show(hiddenWinStack[i]);
-      restack(selmon);
-      memcpy(hiddenWinStack + i, hiddenWinStack + i + 1,
-             (hiddenWinStackTop - i) * sizeof(Client *));
-      --hiddenWinStackTop;
-      --i;
-    }
-  }
-}
+// void 
+// restoreclientwin(Client *c) {
+//   int i;
+//   for (i = 0; i <= hiddenWinStackTop; ++i) {
+//     if (HIDDEN(hiddenWinStack[i]) && hiddenWinStack[i]->tags == c->tags) {
+//       show(hiddenWinStack[i]);
+//       restack(selmon);
+//       memcpy(hiddenWinStack + i, hiddenWinStack + i + 1,
+//              (hiddenWinStackTop - i) * sizeof(Client *));
+//       --hiddenWinStackTop;
+//       --i;
+//     }
+//   }
+// }
 
-void 
-restorewin(const Arg *arg) {
-  int i = hiddenWinStackTop;
-  while (i > -1) {
-    if (HIDDEN(hiddenWinStack[i]) &&
-      hiddenWinStack[i]->tags == selmon->tagset[selmon->seltags]) {
-      show(hiddenWinStack[i]);
-      focus(hiddenWinStack[i]);
-      restack(selmon);
-      for (int j = i; j < hiddenWinStackTop; ++j) {
-        hiddenWinStack[j] = hiddenWinStack[j + 1];
-      }
-      --hiddenWinStackTop;
-      return;
-    }
-    --i;
-  }
-}
+// void 
+// restorewin(const Arg *arg) {
+//   int i = hiddenWinStackTop;
+//   while (i > -1) {
+//     if (HIDDEN(hiddenWinStack[i]) &&
+//       hiddenWinStack[i]->tags == selmon->tagset[selmon->seltags]) {
+//       show(hiddenWinStack[i]);
+//       focus(hiddenWinStack[i]);
+//       restack(selmon);
+//       for (int j = i; j < hiddenWinStackTop; ++j) {
+//         hiddenWinStack[j] = hiddenWinStack[j + 1];
+//       }
+//       --hiddenWinStackTop;
+//       return;
+//     }
+//     --i;
+//   }
+// }
 
 void restoreotherwins(const Arg *arg) {
   int i;
@@ -2230,110 +2229,110 @@ setfullscreen(Client *c, int fullscreen)
 	}
 }
 
-void
-setgaps(int oh, int ov, int ih, int iv)
-{
-	if (oh < 0) oh = 0;
-	if (ov < 0) ov = 0;
-	if (ih < 0) ih = 0;
-	if (iv < 0) iv = 0;
+// void
+// setgaps(int oh, int ov, int ih, int iv)
+// {
+// 	if (oh < 0) oh = 0;
+// 	if (ov < 0) ov = 0;
+// 	if (ih < 0) ih = 0;
+// 	if (iv < 0) iv = 0;
 
-	selmon->gappoh = oh;
-	selmon->gappov = ov;
-	selmon->gappih = ih;
-	selmon->gappiv = iv;
-	arrange(selmon);
-}
+// 	selmon->gappoh = oh;
+// 	selmon->gappov = ov;
+// 	selmon->gappih = ih;
+// 	selmon->gappiv = iv;
+// 	arrange(selmon);
+// }
 
-void
-togglegaps(const Arg *arg)
-{
-	enablegaps = !enablegaps;
-	arrange(selmon);
-}
+// void
+// togglegaps(const Arg *arg)
+// {
+// 	enablegaps = !enablegaps;
+// 	arrange(selmon);
+// }
 
-void
-defaultgaps(const Arg *arg)
-{
-	setgaps(gappoh, gappov, gappih, gappiv);
-}
+// void
+// defaultgaps(const Arg *arg)
+// {
+// 	setgaps(gappoh, gappov, gappih, gappiv);
+// }
 
-void
-incrgaps(const Arg *arg)
-{
-	setgaps(
-		selmon->gappoh + arg->i,
-		selmon->gappov + arg->i,
-		selmon->gappih + arg->i,
-		selmon->gappiv + arg->i
-	);
-}
+// void
+// incrgaps(const Arg *arg)
+// {
+// 	setgaps(
+// 		selmon->gappoh + arg->i,
+// 		selmon->gappov + arg->i,
+// 		selmon->gappih + arg->i,
+// 		selmon->gappiv + arg->i
+// 	);
+// }
 
-void
-incrigaps(const Arg *arg)
-{
-	setgaps(
-		selmon->gappoh,
-		selmon->gappov,
-		selmon->gappih + arg->i,
-		selmon->gappiv + arg->i
-	);
-}
+// void
+// incrigaps(const Arg *arg)
+// {
+// 	setgaps(
+// 		selmon->gappoh,
+// 		selmon->gappov,
+// 		selmon->gappih + arg->i,
+// 		selmon->gappiv + arg->i
+// 	);
+// }
 
-void
-incrogaps(const Arg *arg)
-{
-	setgaps(
-		selmon->gappoh + arg->i,
-		selmon->gappov + arg->i,
-		selmon->gappih,
-		selmon->gappiv
-	);
-}
+// void
+// incrogaps(const Arg *arg)
+// {
+// 	setgaps(
+// 		selmon->gappoh + arg->i,
+// 		selmon->gappov + arg->i,
+// 		selmon->gappih,
+// 		selmon->gappiv
+// 	);
+// }
 
-void
-incrohgaps(const Arg *arg)
-{
-	setgaps(
-		selmon->gappoh + arg->i,
-		selmon->gappov,
-		selmon->gappih,
-		selmon->gappiv
-	);
-}
+// void
+// incrohgaps(const Arg *arg)
+// {
+// 	setgaps(
+// 		selmon->gappoh + arg->i,
+// 		selmon->gappov,
+// 		selmon->gappih,
+// 		selmon->gappiv
+// 	);
+// }
 
-void
-incrovgaps(const Arg *arg)
-{
-	setgaps(
-		selmon->gappoh,
-		selmon->gappov + arg->i,
-		selmon->gappih,
-		selmon->gappiv
-	);
-}
+// void
+// incrovgaps(const Arg *arg)
+// {
+// 	setgaps(
+// 		selmon->gappoh,
+// 		selmon->gappov + arg->i,
+// 		selmon->gappih,
+// 		selmon->gappiv
+// 	);
+// }
 
-void
-incrihgaps(const Arg *arg)
-{
-	setgaps(
-		selmon->gappoh,
-		selmon->gappov,
-		selmon->gappih + arg->i,
-		selmon->gappiv
-	);
-}
+// void
+// incrihgaps(const Arg *arg)
+// {
+// 	setgaps(
+// 		selmon->gappoh,
+// 		selmon->gappov,
+// 		selmon->gappih + arg->i,
+// 		selmon->gappiv
+// 	);
+// }
 
-void
-incrivgaps(const Arg *arg)
-{
-	setgaps(
-		selmon->gappoh,
-		selmon->gappov,
-		selmon->gappih,
-		selmon->gappiv + arg->i
-	);
-}
+// void
+// incrivgaps(const Arg *arg)
+// {
+// 	setgaps(
+// 		selmon->gappoh,
+// 		selmon->gappov,
+// 		selmon->gappih,
+// 		selmon->gappiv + arg->i
+// 	);
+// }
 
 void
 setlayout(const Arg *arg)
