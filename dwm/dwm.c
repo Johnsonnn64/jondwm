@@ -2507,16 +2507,12 @@ sigterm(int unused)
 void
 spawn(const Arg *arg)
 {
-  if (selmon->sellt == 1) {   // if layout is monocle 
-    sprintf(ds, "%d", 0);
-    sprintf(dv, "%d", 0);
-    sprintf(ms, "%d", selmon->ww);
-  } else {
-    sprintf(ds, "%d", sidepad);
-    sprintf(dv, "%d", vertpad);
-    sprintf(ms, "%d", selmon->ww - sidepad * 2);
+  if (arg->v != NULL) {
+    sprintf(ds, "%d", sp);
+    sprintf(dv, "%d", selmon->mh - selmon->wh - bh);
+    sprintf(ms, "%d", selmon->ww - sp * 2);
+    sprintf(dh, "%d", bh);
   }
-  sprintf(dh, "%d", bh);
   if (fork() == 0) {
     if (dpy)
       close(ConnectionNumber(dpy));
