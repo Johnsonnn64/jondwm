@@ -6,7 +6,7 @@
 interval=0
 
 # load colors
-. ~/workspace/suckless/dwm/bar/catppuccin
+. ~/workspace/suckless/jondwm/bar/catppuccin
 
 
 #cpu() {
@@ -62,16 +62,16 @@ brightness() {
 }
 
 mem() {
-	printf "^c$green^ 󰆼"
+	printf "^c$green^ 󰆼 "
 	printf "^c$green^ $(free -h | awk '/^Mem/ { print $3 }' | sed s/i//g)"
 }
 
 wlan() {
   state=$(cat /sys/class/net/*/operstate | grep up)
   if [ -z "$state" ]; then 
-    printf "^c$red^ 󰤭^d^%s" " ^c$red^Disconnected"
+    printf "^c$red^ 󰤭 ^d^%s" " ^c$red^Disconnected"
   else
-    printf "^c$blue^ 󰤨^d^%s" " ^c$blue^Connected"
+    printf "^c$blue^ 󰤨 ^d^%s" " ^c$blue^Connected"
   fi
 }
 
@@ -96,5 +96,5 @@ while true; do
 
   [ $interval = 0 ] || [ $(($interval % 5)) = 0 ] && wlan=$(wlan) && mem=$(mem) battery=$(battery) && brightness=$(brightness) && volume=$(volume)
 
-  sleep 1 && xsetroot -name "$(echo "$wlan $mem $battery $brightness $volume ")"
+  sleep 1 && xsetroot -name "$(echo "$wlan $mem $volume ")"
 done
