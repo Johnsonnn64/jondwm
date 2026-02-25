@@ -131,13 +131,6 @@ typedef struct {
 	void (*arrange)(Monitor *);
 } Layout;
 
-typedef struct {
-	int mw, mh;    /* >= matching */
-	int layout;    /* only apply if this is the current layout, <0 for no matching */
-	int nmaster;   /* the new nmaster to apply */
-	float mfact;   /* the new mfact to apply */
-} LayoutMonitorRule;
-
 typedef struct Pertag Pertag;
 struct Monitor {
 	char ltsymbol[16];
@@ -184,7 +177,6 @@ typedef struct {
 } ClientSpecific;
 
 /* function declarations */
-static void applylmrules(void);
 static void applyrules(Client *c);
 static int applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact);
 static void arrange(Monitor *m);
@@ -307,9 +299,7 @@ static int xerrordummy(Display *dpy, XErrorEvent *ee);
 static int xerrorstart(Display *dpy, XErrorEvent *ee);
 static void zoom(const Arg *arg);
 static void centeredmaster(Monitor *m);
-static void centeredfloatingmaster(Monitor *m);
 static void getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int *nc);
-static void getfacts(Monitor *m, int msize, int ssize, float *mf, float *sf, int *mr, int *sr);
 static pid_t getparentprocess(pid_t p);
 static int isdescprocess(pid_t p, pid_t c);
 static Client *swallowingclient(Window w);
@@ -383,39 +373,6 @@ struct Pertag {
 struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
 
 /* function implementations */
-void
-applylmrules(void)
-{
-	size_t t;
-  Monitor *m;
-
-  for (m = mons; m; m = m->next) {
-    for (t = 0; t <= LENGTH(tags); t++) {
-      float new_mfact = mfact;
-      int new_nmaster = nmaster;
-      size_t i;
-
-      for (i = 0; i < LENGTH(lm_rules); i++) {
-        const LayoutMonitorRule *lmr = &lm_rules[i];
-
-        if (m->mw >= lmr->mw &&
-          m->mh >= lmr->mh &&
-          m->lt[m->pertag->sellts[t]] == &layouts[lmr->layout])
-        {
-          new_mfact = lmr->mfact;
-          new_nmaster = lmr->nmaster;
-          break;
-        }
-      }
-      m->pertag->mfacts[t] = new_mfact;
-      m->pertag->nmasters[t] = new_nmaster;
-    }
-    m->mfact = m->pertag->mfacts[m->pertag->curtag];
-    m->nmaster = m->pertag->nmasters[m->pertag->curtag];
-    arrange(m);
-  }
-}
-
 void
 applyrules(Client *c)
 {
@@ -787,7 +744,6 @@ configurenotify(XEvent *e)
 			}
 			focus(NULL);
 			arrange(NULL);
-			applylmrules();
 		}
 	}
 }
@@ -2342,7 +2298,7 @@ setlayout(const Arg *arg)
 	if (arg && arg->v)
 		selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt] = (Layout *)arg->v;
 	strncpy(selmon->ltsymbol, selmon->lt[selmon->sellt]->symbol, sizeof selmon->ltsymbol);
-	applylmrules();
+  arrange(selmon);
 	if (!selmon->sel)
 		drawbar(selmon);
 }
@@ -2423,7 +2379,6 @@ setup(void)
   /* init bars */
 	updatebars();
 	updatestatus();
-	applylmrules();
 	/* supporting window for NetWMCheck */
 	wmcheckwin = XCreateSimpleWindow(dpy, root, 0, 0, 1, 1, 0, 0, 0);
 	XChangeProperty(dpy, wmcheckwin, netatom[NetWMCheck], XA_WINDOW, 32,
@@ -3421,62 +3376,6 @@ centeredmaster(Monitor *m)
 }
 
 void
-centeredfloatingmaster(Monitor *m)
-{
-	unsigned int i, n;
-	float mfacts, sfacts;
-	float mivf = 1.0; // master inner vertical gap factor
-	int oh, ov, ih, iv, mrest, srest;
-	int mx = 0, my = 0, mh = 0, mw = 0;
-	int sx = 0, sy = 0, sh = 0, sw = 0;
-	Client *c;
-
-  sp = sidepad;
-  updatebarpos(m);
-  XMoveResizeWindow(dpy, m->barwin, m->wx + sp, m->by + vp, m->ww -  2 * sp, bh);
-
-	getgaps(m, &oh, &ov, &ih, &iv, &n);
-	if (n == 0)
-		return;
-
-	sx = mx = m->wx + ov;
-	sy = my = m->wy + oh;
-	sh = mh = m->wh - 2*oh;
-	mw = m->ww - 2*ov - iv*(n - 1);
-	sw = m->ww - 2*ov - iv*(n - m->nmaster - 1);
-
-	if (m->nmaster && n > m->nmaster) {
-		mivf = 0.8;
-		/* go mfact box in the center if more than nmaster clients */
-		if (m->ww > m->wh) {
-			mw = m->ww * m->mfact - iv*mivf*(MIN(n, m->nmaster) - 1);
-			mh = m->wh * 0.9;
-		} else {
-			mw = m->ww * 0.9 - iv*mivf*(MIN(n, m->nmaster) - 1);
-			mh = m->wh * m->mfact;
-		}
-		mx = m->wx + (m->ww - mw) / 2;
-		my = m->wy + (m->wh - mh - 2*oh) / 2;
-
-		sx = m->wx + ov;
-		sy = m->wy + oh;
-		sh = m->wh - 2*oh;
-	}
-
-	getfacts(m, mw, sw, &mfacts, &sfacts, &mrest, &srest);
-
-	for (i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
-		if (i < m->nmaster) {
-			/* nmaster clients are stacked horizontally, in the center of the screen */
-			resize(c, mx, my, (mw / mfacts) + (i < mrest ? 1 : 0) - (2*c->bw), mh - (2*c->bw), 0);
-			mx += WIDTH(c) + iv*mivf;
-		} else {
-			/* stack clients are stacked horizontally */
-			resize(c, sx, sy, (sw / sfacts) + ((i - m->nmaster) < srest ? 1 : 0) - (2*c->bw), sh - (2*c->bw), 0);
-			sx += WIDTH(c) + iv;
-		}
-}
-void
 getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int *nc)
 {
 	unsigned int n, oe, ie;
@@ -3494,28 +3393,4 @@ getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int *nc)
 	*ih = m->gappih*ie; // inner horizontal gap
 	*iv = m->gappiv*ie; // inner vertical gap
 	*nc = n;            // number of clients
-}
-
-void
-getfacts(Monitor *m, int msize, int ssize, float *mf, float *sf, int *mr, int *sr)
-{
-	unsigned int n;
-	float mfacts, sfacts;
-	int mtotal = 0, stotal = 0;
-	Client *c;
-
-	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
-	mfacts = MIN(n, m->nmaster);
-	sfacts = n - m->nmaster;
-
-	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++)
-		if (n < m->nmaster)
-			mtotal += msize / mfacts;
-		else
-			stotal += ssize / sfacts;
-
-	*mf = mfacts; // total factor of master area
-	*sf = sfacts; // total factor of stack area
-	*mr = msize - mtotal; // the remainder (rest) of pixels after an even master split
-	*sr = ssize - stotal; // the remainder (rest) of pixels after an even stack split
 }

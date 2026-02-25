@@ -12,33 +12,30 @@ static const unsigned int gappov    = 20;       /* vert outer gap between window
 static const int swallowfloating    = 0;        /* 1 means swallow floating windows by default */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const int user_bh            = 32;        /* 0 means that dwm will calculate bar height, >= 1 means dwm will user_bh as bar height */
+static const int user_bh            = 40;        /* 0 means that dwm will calculate bar height, >= 1 means dwm will user_bh as bar height */
 static const int vertpad            = 20;       /* vertical padding of bar */
 static const int sidepad            = 20;       /* horizontal padding of bar */
 static const int focusonwheel       = 1;    /* click on focus with mousewheel */
 
 #include "catppuccin.h"
 
-static const char *fonts[]             = { "JetBrainsMono Nerd Font:style=Medium:size=10:antialias=true", 
-                                           "Symbols Nerd Font Mono:style=2049-em:size=11" };
-/* static const char *fonts[]                = { "Symbols Nerd Font Mono:style=2049-em:size=11",
-                                              "Iosevka Nerd Font:style=Medium:size=12:antialias=true" }; */
+static const char *fonts[]             = { "JetBrainsMono Nerd Font:style=Regular:size=11.5:antialias=true" };
 
 static const char *colors[][3]      = {
 	/*                     fg               bg         border   */
-  [SchemeNorm]       = { orange,          black,     gray2 },
-  [SchemeSel]        = { red,             black,     red },
-  [SchemeTag]        = { gray3,           black,     black },
-  [SchemeTag1]       = { yellow,          black,     black },
-  [SchemeTag2]       = { red,             black,     black },
-  [SchemeTag3]       = { orange,          black,     black },
-  [SchemeTag4]       = { green,           black,     black },
-  [SchemeTag5]       = { pink,            black,     black },
-  [SchemeTag6]       = { blue,            black,     black },
-  [SchemeTag7]       = { green,           black,     black },
-  // [SchemeTag8]       = { yellow,          black,     black },
-  // [SchemeTag9]       = { red,             black,     black },
-  [SchemeLayout]     = { yellow,          black,     black },
+  [SchemeNorm]       = { peach,          base,     gray2 },
+  [SchemeSel]        = { red,             base,     pink },
+  [SchemeTag]        = { gray3,           base,     base },
+  [SchemeTag1]       = { yellow,          base,     base },
+  [SchemeTag2]       = { red,             base,     base },
+  [SchemeTag3]       = { peach,          base,     base },
+  [SchemeTag4]       = { green,           base,     base },
+  [SchemeTag5]       = { pink,            base,     base },
+  [SchemeTag6]       = { blue,            base,     base },
+  [SchemeTag7]       = { green,           base,     base },
+  // [SchemeTag8]       = { yellow,          base,     base },
+  // [SchemeTag9]       = { red,             base,     base },
+  [SchemeLayout]     = { yellow,          base,     base },
 };                       
                          
 /* tagging */
@@ -78,24 +75,18 @@ static const Rule rules[] = {
 };
 
 /* layout(s) */
-static const float mfact     = 0.50; /* factor of master area size [0.05..0.95] */
+static const float mfact     = 0.45; /* factor of master area size [0.05..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
 
-static const LayoutMonitorRule lm_rules[] = {
-	/* >=w, >=h, req'd layout, new nmaster, new mfact */
-	/*{ 2560, 1440,   0,         1,           0.50 },*/
-	{ 0, 1500, 	0,	   0,		0.50 },
-};
-
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-	{ "󰊠",        tile },    /* first entry is default */
+  /* first entry is default */
+	{ "|M|",      centeredmaster },
+	{ "󰊠",        tile },
 	{ "><>",      NULL },    /* no layout function means floating behavior */
 	{ "[M]",      monocle },
-	{ "|M|",      centeredmaster },
-	{ ">M>",      centeredfloatingmaster },
 };
 
 typedef struct {
@@ -216,15 +207,14 @@ static const Key keys[] = {
 	{ MODKEY,                             0,     -1,  XK_d,      incnmaster,     {.i = -1 } },
 	{ MODKEY,                             0,     -1,  XK_h,      setmfact,       {.f = -0.05} },
 	{ MODKEY,                             0,     -1,  XK_l,      setmfact,       {.f = +0.05} },
-	{ MODKEY,                             0,     -1,  XK_u,      setlayout,      {.v = &layouts[3]} },
-	{ MODKEY,                             0,     -1,  XK_o,      setlayout,      {.v = &layouts[4]} },
+	{ MODKEY,                             0,     -1,  XK_u,      setlayout,      {.v = &layouts[0]} },
   { Mod4Mask,                           0,     -1,  XK_m,      movecenter,     {0} },
 	{ MODKEY,                             0,     -1,  XK_Return, zoom,           {0} },
 	{ MODKEY,                             0,     -1,  XK_q,      killclient,     {0} },
-	{ MODKEY,                             0,     -1,  XK_t,      setlayout,      {.v = &layouts[0]} },
-	{ MODKEY|ShiftMask,                   0,     -1,  XK_t,      setlayout,      {.v = &layouts[1]} },
+	{ MODKEY,                             0,     -1,  XK_t,      setlayout,      {.v = &layouts[1]} },
+	{ MODKEY|ShiftMask,                   0,     -1,  XK_t,      setlayout,      {.v = &layouts[2]} },
 	{ MODKEY,                             0,     -1,  XK_f,      togglefullscr,  {0} },
-	{ MODKEY,                             0,     -1,  XK_m,      setlayout,      {.v = &layouts[2]} },
+	{ MODKEY,                             0,     -1,  XK_m,      setlayout,      {.v = &layouts[3]} },
   { MODKEY,                             0,     -1,  XK_space,  spawn,          SHCMD("dunstctl close-all") },
 	{ MODKEY|ShiftMask,                   0,     -1,  XK_space,  togglefloating, {0} },
 	// { MODKEY,                          0,     -1,     XK_0,      view,           {.ui = ~0 } },
