@@ -224,10 +224,10 @@ static const Key keys[] = {
 	{ MODKEY|ShiftMask,                   0,     -1,  XK_space,  togglefloating, {0} },
 	// { MODKEY,                          0,     -1,     XK_0,      view,           {.ui = ~0 } },
 	// { MODKEY|ShiftMask,                0,     -1,     XK_0,      tag,            {.ui = ~0 } },
-	{ MODKEY,                             0,     -1,  XK_comma,  focusnthmon,    {.i = 0 } },
-	{ MODKEY,                             0,     -1,  XK_period, focusnthmon,    {.i = 1 } },
-	{ MODKEY|ShiftMask,                   0,     -1,  XK_comma,  tagnthmon,      {.i = 0 } },
-	{ MODKEY|ShiftMask,                   0,     -1,  XK_period, tagnthmon,      {.i = 1 } },
+	{ MODKEY,                             0,     -1,  XK_comma,  focusnthmon,    {.i = 1 } },
+	{ MODKEY,                             0,     -1,  XK_period, focusnthmon,    {.i = 0 } },
+	{ MODKEY|ShiftMask,                   0,     -1,  XK_comma,  tagnthmon,      {.i = 1 } },
+	{ MODKEY|ShiftMask,                   0,     -1,  XK_period, tagnthmon,      {.i = 0 } },
 	TAGKEYS(                              0,     -1,  XK_1,                      0)
 	TAGKEYS(                              0,     -1,  XK_2,                      1)
 	TAGKEYS(                              0,     -1,  XK_3,                      2)
