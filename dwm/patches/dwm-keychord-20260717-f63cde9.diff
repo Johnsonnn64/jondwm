@@ -1,0 +1,272 @@
+From 9c020a20a2e1091e8b47edfea5e8795d8b451bc9 Mon Sep 17 00:00:00 2001
+From: Lukasz Kasprzak <lukas@labunix.xyz>
+Date: Fri, 17 Jul 2026 15:45:22 +0200
+Subject: [PATCH] keychord: bind a sequence of keys, and dispatch events while
+ waiting
+
+Original keychord patch by Hai Nguyen <hhai2105@gmail.com>, updated for
+dwm 6.4+ grabkeys() by Aaron Zueger <contact@azureorange.xyz>. This
+revision rebases onto dwm 6.8 and fixes an event-loss bug in the chord
+wait loop.
+
+The wait loop used to discard every event that was not a KeyPress:
+
+    while (running && !XNextEvent(dpy, &event) && !ran)
+            if(event.type == KeyPress)
+                    break;
+
+Two consequences, both reproduced on Xephyr:
+
+1. Unrecoverable input freeze. grabbuttons() grabs unfocused clients
+   GrabModeSync/GrabModeSync, so clicking one freezes pointer AND
+   keyboard until the grabbing client calls XAllowEvents. dwm does that
+   in buttonpress() -- but if the ButtonPress is discarded here,
+   buttonpress() never runs. The grab stays frozen forever and the loop
+   can never exit, because a frozen keyboard cannot deliver the KeyPress
+   it is waiting for. Only killing dwm ends it; XSendEvent is discarded
+   by this same loop and XTEST queues behind the frozen device.
+   Repro: press a chord prefix, then click any unfocused client.
+   Observed: XGrabKeyboard -> GrabFrozen, XQueryPointer -> Button1 held.
+
+2. Orphaned windows. A MapRequest arriving mid-chord is dropped, so a
+   window opening during a chord is never managed. DestroyNotify,
+   Expose and ConfigureRequest are lost the same way.
+
+Dispatch through handler[] as run() does, breaking on KeyPress before
+dispatch so keypress() cannot recurse. The `&& !ran` term is dropped:
+ran is always 0 on entry and nothing in the body can set it.
+---
+ config.def.h | 81 ++++++++++++++++++++++++++--------------------------
+ dwm.c        | 79 +++++++++++++++++++++++++++++++++++++++++---------
+ 2 files changed, 106 insertions(+), 54 deletions(-)
+
+diff --git a/config.def.h b/config.def.h
+index 81c3fc0..7c7ec36 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -47,11 +47,11 @@ static const Layout layouts[] = {
+ 
+ /* key definitions */
+ #define MODKEY Mod1Mask
+-#define TAGKEYS(KEY,TAG) \
+-	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
+-	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
+-	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
+-	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
++#define TAGKEYS(KEY,TAG)                                                                                               \
++       &((Keychord){1, {{MODKEY, KEY}},                                        view,           {.ui = 1 << TAG} }), \
++       &((Keychord){1, {{MODKEY|ControlMask, KEY}},                            toggleview,     {.ui = 1 << TAG} }), \
++       &((Keychord){1, {{MODKEY|ShiftMask, KEY}},                              tag,            {.ui = 1 << TAG} }), \
++       &((Keychord){1, {{MODKEY|ControlMask|ShiftMask, KEY}},                  toggletag,      {.ui = 1 << TAG} }),
+ 
+ /* helper for spawning shell commands in the pre dwm-5.0 fashion */
+ #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
+@@ -61,41 +61,42 @@ static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn()
+ static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
+ static const char *termcmd[]  = { "st", NULL };
+ 
+-static const Key keys[] = {
+-	/* modifier                     key        function        argument */
+-	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
+-	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
+-	{ MODKEY,                       XK_b,      togglebar,      {0} },
+-	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
+-	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
+-	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
+-	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
+-	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
+-	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
+-	{ MODKEY,                       XK_Return, zoom,           {0} },
+-	{ MODKEY,                       XK_Tab,    view,           {0} },
+-	{ MODKEY|ShiftMask,             XK_c,      killclient,     {0} },
+-	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
+-	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
+-	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
+-	{ MODKEY,                       XK_space,  setlayout,      {0} },
+-	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
+-	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
+-	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
+-	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
+-	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
+-	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
+-	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
+-	TAGKEYS(                        XK_1,                      0)
+-	TAGKEYS(                        XK_2,                      1)
+-	TAGKEYS(                        XK_3,                      2)
+-	TAGKEYS(                        XK_4,                      3)
+-	TAGKEYS(                        XK_5,                      4)
+-	TAGKEYS(                        XK_6,                      5)
+-	TAGKEYS(                        XK_7,                      6)
+-	TAGKEYS(                        XK_8,                      7)
+-	TAGKEYS(                        XK_9,                      8)
+-	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
++static Keychord *keychords[] = {
++       /* Keys        function        argument */
++       &((Keychord){1, {{MODKEY, XK_p}},                                       spawn,          {.v = dmenucmd } }),
++       &((Keychord){1, {{MODKEY|ShiftMask, XK_Return}},                        spawn,          {.v = termcmd } }),
++       &((Keychord){2, {{MODKEY, XK_e}, {MODKEY, XK_e}},                       spawn,          {.v = termcmd } }),
++       &((Keychord){1, {{MODKEY, XK_b}},                                       togglebar,      {0} }),
++       &((Keychord){1, {{MODKEY, XK_j}},                                       focusstack,     {.i = +1 } }),
++       &((Keychord){1, {{MODKEY, XK_k}},                                       focusstack,     {.i = -1 } }),
++       &((Keychord){1, {{MODKEY, XK_i}},                                       incnmaster,     {.i = +1 } }),
++       &((Keychord){1, {{MODKEY, XK_d}},                                       incnmaster,     {.i = -1 } }),
++       &((Keychord){1, {{MODKEY, XK_h}},                                       setmfact,       {.f = -0.05} }),
++       &((Keychord){1, {{MODKEY, XK_l}},                                       setmfact,       {.f = +0.05} }),
++       &((Keychord){1, {{MODKEY, XK_Return}},                                  zoom,           {0} }),
++       &((Keychord){1, {{MODKEY, XK_Tab}},                                     view,           {0} }),
++       &((Keychord){1, {{MODKEY|ShiftMask, XK_c}},                             killclient,     {0} }),
++       &((Keychord){1, {{MODKEY, XK_t}},                                       setlayout,      {.v = &layouts[0]} }),
++       &((Keychord){1, {{MODKEY, XK_f}},                                       setlayout,      {.v = &layouts[1]} }),
++       &((Keychord){1, {{MODKEY, XK_m}},                                       setlayout,      {.v = &layouts[2]} }),
++       &((Keychord){1, {{MODKEY, XK_space}},                                   setlayout,      {0} }),
++       &((Keychord){1, {{MODKEY|ShiftMask, XK_space}},                         togglefloating, {0} }),
++       &((Keychord){1, {{MODKEY, XK_0}},                                       view,           {.ui = ~0 } }),
++       &((Keychord){1, {{MODKEY|ShiftMask, XK_0}},                             tag,            {.ui = ~0 } }),
++       &((Keychord){1, {{MODKEY, XK_comma}},                                   focusmon,       {.i = -1 } }),
++       &((Keychord){1, {{MODKEY, XK_period}},                                  focusmon,       {.i = +1 } }),
++       &((Keychord){1, {{MODKEY|ShiftMask, XK_comma}},                         tagmon,         {.i = -1 } }),
++       &((Keychord){1, {{MODKEY|ShiftMask, XK_period}},                        tagmon,         {.i = +1 } }),
++       &((Keychord){1, {{MODKEY|ShiftMask, XK_q}},                             quit,           {0} }),
++	   TAGKEYS(                        XK_1,                      0)
++	   TAGKEYS(                        XK_2,                      1)
++	   TAGKEYS(                        XK_3,                      2)
++	   TAGKEYS(                        XK_4,                      3)
++	   TAGKEYS(                        XK_5,                      4)
++	   TAGKEYS(                        XK_6,                      5)
++	   TAGKEYS(                        XK_7,                      6)
++	   TAGKEYS(                        XK_8,                      7)
++	   TAGKEYS(                        XK_9,                      8)
+ };
+ 
+ /* button definitions */
+diff --git a/dwm.c b/dwm.c
+index 53b393e..243b12c 100644
+--- a/dwm.c
++++ b/dwm.c
+@@ -101,9 +101,14 @@ struct Client {
+ typedef struct {
+ 	unsigned int mod;
+ 	KeySym keysym;
++} Key;
++
++typedef struct {
++    unsigned int n;
++    const Key keys[5];
+ 	void (*func)(const Arg *);
+ 	const Arg arg;
+-} Key;
++} Keychord;
+ 
+ typedef struct {
+ 	const char *symbol;
+@@ -266,6 +271,7 @@ static Display *dpy;
+ static Drw *drw;
+ static Monitor *mons, *selmon;
+ static Window root, wmcheckwin;
++unsigned int currentkey = 0;
+ 
+ /* configuration, allows nested code to access above variables */
+ #include "config.h"
+@@ -954,7 +960,8 @@ grabkeys(void)
+ {
+ 	updatenumlockmask();
+ 	{
+-		unsigned int i, j, k;
++		/* unsigned int i, j, k; */
++		unsigned int i, c, k;
+ 		unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
+ 		int start, end, skip;
+ 		KeySym *syms;
+@@ -964,15 +971,18 @@ grabkeys(void)
+ 		syms = XGetKeyboardMapping(dpy, start, end - start + 1, &skip);
+ 		if (!syms)
+ 			return;
++
+ 		for (k = start; k <= end; k++)
+-			for (i = 0; i < LENGTH(keys); i++)
++			for (i = 0; i < LENGTH(keychords); i++)
+ 				/* skip modifier codes, we do that ourselves */
+-				if (keys[i].keysym == syms[(k - start) * skip])
+-					for (j = 0; j < LENGTH(modifiers); j++)
++				if (keychords[i]->keys[currentkey].keysym == syms[(k - start) * skip])
++					for (c = 0; c < LENGTH(modifiers); c++)
+ 						XGrabKey(dpy, k,
+-							 keys[i].mod | modifiers[j],
++							 keychords[i]->keys[currentkey].mod | modifiers[c],
+ 							 root, True,
+ 							 GrabModeAsync, GrabModeAsync);
++                if(currentkey > 0)
++                        XGrabKey(dpy, XKeysymToKeycode(dpy, XK_Escape), AnyModifier, root, True, GrabModeAsync, GrabModeAsync);
+ 		XFree(syms);
+ 	}
+ }
+@@ -999,17 +1009,58 @@ isuniquegeom(XineramaScreenInfo *unique, size_t n, XineramaScreenInfo *info)
+ void
+ keypress(XEvent *e)
+ {
+-	unsigned int i;
++	/* unsigned int i; */
++    XEvent event = *e;
++    unsigned int ran = 0;
+ 	KeySym keysym;
+ 	XKeyEvent *ev;
+ 
+-	ev = &e->xkey;
+-	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
+-	for (i = 0; i < LENGTH(keys); i++)
+-		if (keysym == keys[i].keysym
+-		&& CLEANMASK(keys[i].mod) == CLEANMASK(ev->state)
+-		&& keys[i].func)
+-			keys[i].func(&(keys[i].arg));
++    Keychord *arr1[sizeof(keychords) / sizeof(Keychord*)];
++    Keychord *arr2[sizeof(keychords) / sizeof(Keychord*)];
++    memcpy(arr1, keychords, sizeof(keychords));
++    Keychord **rpointer = arr1;
++    Keychord **wpointer = arr2;
++
++    size_t r = sizeof(keychords)/ sizeof(Keychord*);
++
++    while(1){
++            ev = &event.xkey;
++            keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
++            size_t w = 0;
++            for (int i = 0; i < r; i++){
++                    if(keysym == (*(rpointer + i))->keys[currentkey].keysym
++                       && CLEANMASK((*(rpointer + i))->keys[currentkey].mod) == CLEANMASK(ev->state)
++                       && (*(rpointer + i))->func){
++                            if((*(rpointer + i))->n == currentkey +1){
++                                    (*(rpointer + i))->func(&((*(rpointer + i))->arg));
++                                    ran = 1;
++                            }else{
++                                    *(wpointer + w) = *(rpointer + i);
++                                    w++;
++                            }
++                    }
++            }
++            currentkey++;
++            if(w == 0 || ran == 1)
++                    break;
++            grabkeys();
++            /* Events arriving mid-chord must be dispatched, not dropped:
++             * discarding a ButtonPress that activated the GrabModeSync grab
++             * from grabbuttons() freezes pointer and keyboard permanently,
++             * since only buttonpress()'s XAllowEvents can release it. */
++            while (running && !XNextEvent(dpy, &event)) {
++                    if (event.type == KeyPress)
++                            break;
++                    if (handler[event.type])
++                            handler[event.type](&event); /* call handler */
++            }
++            r = w;
++            Keychord **holder = rpointer;
++            rpointer = wpointer;
++            wpointer = holder;
++    }
++    currentkey = 0;
++    grabkeys();
+ }
+ 
+ void
+-- 
+2.47.3
+
