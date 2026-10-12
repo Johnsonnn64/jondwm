@@ -55,23 +55,24 @@ static const Rule rules[] = {
   /*xprop(1):
     WM_CLASS(STRING) = instance, class
     WM_NAME(STRING) = title*/
-  // class           instance   title           tags centered floating terminal noswal mon spnum
-  { "st-256color",   NULL,      NULL,           0,   0,       0,       1,       0,     -1, -1 },
-  { "Alacritty",     NULL,      NULL,           0,   0,       0,       1,       0,     -1, -1 },
-  { "Dragon-drop",   NULL,      NULL,           ~0,  1,       1,       0,       1,     -1, -1 },
-  { NULL,            NULL,      "Event Tester", 0,   0,       0,       0,       1,     -1, -1 },
-  { NULL,            "fcen",    NULL,           0,   1,       1,       0,       1,     -1, -1 },
-  { NULL,            "fl",      NULL,           0,   0,       1,       0,       1,     -1, -1 },
+  /* ignorefs: 1 allows the window above isolated fullscreen clients. */
+  // class           instance   title           tags centered floating terminal noswal mon spnum ignorefs
+  { "st-256color",   NULL,      NULL,           0,   0,       0,       1,       0,     -1, -1, 0 },
+  { "Alacritty",     NULL,      NULL,           0,   0,       0,       1,       0,     -1, -1, 0 },
+  { "Dragon-drop",   NULL,      NULL,           ~0,  1,       1,       0,       1,     -1, -1, 1 },
+  { NULL,            NULL,      "Event Tester", 0,   0,       0,       0,       1,     -1, -1, 0 },
+  { NULL,            "fcen",    NULL,           0,   1,       1,       0,       1,     -1, -1, 0 },
+  { NULL,            "fl",      NULL,           0,   0,       1,       0,       1,     -1, -1, 0 },
 
-  /* scratchpads*/
-  { NULL,		         "spterm",	NULL,	          0,	 1,       1,			 1,       0,     -1, 0  },
-  { NULL,		         "spfm",	  NULL,	          0,	 1,       1,			 1,       0,     -1, 1  },
-  { NULL,		         "spcalcu", NULL,	          0,	 1,       1,			 0,       0,     -1, 2  },
-  { NULL,		         "spvol",   NULL,	          0,	 1,       1,			 0,       0,     -1, 3  },
-  { NULL,		         "sptop",   NULL,	          0,	 1,       1,			 0,       0,     -1, 4  },
-  { NULL,		         "spnote",  NULL,	          0,	 1,       1,			 0,       0,     -1, 5  },
-  { "discord",       NULL,      NULL,           0,   1,       1,       0,       0,     -1, 6  },
-  { "com.github.th_ch.youtube_music", NULL,      NULL,           0,   1,       1,       0,       0,     -1, 7  },
+  /* scratchpads */
+  { NULL,		         "spterm",	NULL,	          0,	 1,       1,			 1,       0,     -1, 0, 1 },
+  { NULL,		         "spfm",	  NULL,	          0,	 1,       1,			 1,       0,     -1, 1, 1 },
+  { NULL,		         "spcalcu", NULL,	          0,	 1,       1,			 0,       0,     -1, 2, 1 },
+  { NULL,		         "spvol",   NULL,	          0,	 1,       1,			 0,       0,     -1, 3, 1 },
+  { NULL,		         "sptop",   NULL,	          0,	 1,       1,			 0,       0,     -1, 4, 1 },
+  { NULL,		         "spnote",  NULL,	          0,	 1,       1,			 0,       0,     -1, 5, 1 },
+  { "discord",       NULL,      NULL,           0,   1,       1,       0,       0,     -1, 6, 1 },
+  { "com.github.th_ch.youtube_music", NULL,      NULL,           0,   1,       1,       0,       0,     -1, 7, 1 },
 };
 
 /* layout(s) */
