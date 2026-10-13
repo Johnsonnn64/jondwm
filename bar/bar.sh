@@ -55,9 +55,11 @@ battery() {
 
 brightness() {
   if [ -f /sys/class/backlight/*/brightness ]; then
+    max=$(cat /sys/class/backlight/*/max_brightness)
+
     printf "^c$red^  "
     printf "^c$red^%.0f\n" $(i=$(cat /sys/class/backlight/*/brightness)
-    echo $i/25 | bc)0
+    echo "scale=2; $i/($max/100)" | bc)
   fi
 }
 
@@ -96,5 +98,5 @@ while true; do
 
   [ $interval = 0 ] || [ $(($interval % 5)) = 0 ] && wlan=$(wlan) && mem=$(mem) battery=$(battery) && brightness=$(brightness) && volume=$(volume)
 
-  sleep 1 && xsetroot -name "$(echo "$wlan $mem $volume ")"
+  sleep 1 && xsetroot -name "$(echo "$wlan $mem $volume $battery $brightness")"
 done
