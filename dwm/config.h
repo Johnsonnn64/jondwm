@@ -51,6 +51,9 @@ static const unsigned int ulinestroke	= 2;	/* thickness / height of the underlin
 static const unsigned int ulinevoffset	= 4;	/* how far above the bottom of the bar the line should appear */
 static const int ulineall 		= 0;	/* 1 to show underline on all tags, 0 for just the active ones */
 
+/* Shared scratchpad IDs for rules and designated scratchpads[] entries. */
+enum { SpTerm, SpFm, SpCalcu, SpVol, SpTop, SpDiscord, SpYtm };
+
 static const Rule rules[] = {
   /*xprop(1):
     WM_CLASS(STRING) = instance, class
@@ -64,15 +67,14 @@ static const Rule rules[] = {
   { NULL,            "fcen",    NULL,           0,   1,       1,       0,       1,     -1, -1, 0 },
   { NULL,            "fl",      NULL,           0,   0,       1,       0,       1,     -1, -1, 0 },
 
-  /* scratchpads */
-  { NULL,		         "spterm",	NULL,	          0,	 1,       1,			 1,       0,     -1, 0, 1 },
-  { NULL,		         "spfm",	  NULL,	          0,	 1,       1,			 1,       0,     -1, 1, 1 },
-  { NULL,		         "spcalcu", NULL,	          0,	 1,       1,			 0,       0,     -1, 2, 1 },
-  { NULL,		         "spvol",   NULL,	          0,	 1,       1,			 0,       0,     -1, 3, 1 },
-  { NULL,		         "sptop",   NULL,	          0,	 1,       1,			 0,       0,     -1, 4, 1 },
-  { NULL,		         "spnote",  NULL,	          0,	 1,       1,			 0,       0,     -1, 5, 1 },
-  { "discord",       NULL,      NULL,           0,   1,       1,       0,       0,     -1, 6, 1 },
-  { "com.github.th_ch.youtube_music", NULL,      NULL,           0,   1,       1,       0,       0,     -1, 7, 1 },
+  /* scratchpads: use the same enum ID here and in scratchpads[] */
+  { NULL,		         "spterm",	NULL,	          0,	 1,       1,			 1,       0,     -1, SpTerm,    1 },
+  { NULL,		         "spfm",	  NULL,	          0,	 1,       1,			 1,       0,     -1, SpFm,      1 },
+  { NULL,		         "spcalcu", NULL,	          0,	 1,       1,			 0,       0,     -1, SpCalcu,   1 },
+  { NULL,		         "spvol",   NULL,	          0,	 1,       1,			 0,       0,     -1, SpVol,     1 },
+  { NULL,		         "sptop",   NULL,	          0,	 1,       1,			 0,       0,     -1, SpTop,     1 },
+  { "discord",       NULL,      NULL,           0,   1,       1,       0,       0,     -1, SpDiscord, 1 },
+  // { "com.github.th_ch.youtube_music", NULL,      NULL,           0,   1,       1,       0,       0,     -1, SpYtm,     1 },
 };
 
 /* layout(s) */
@@ -120,15 +122,15 @@ const char *dcmd[] = {"discord", NULL };
 const char *ytmcmd[] = {"youtube-music", NULL };
 
 static Sp scratchpads[] = {
-  /* name          cmd  */
-  {"spterm",       spterm},
-  {"splf",         spfm},
-  {"spcalcu",      spbc},
-  {"spvol",        sppm},
-  {"sptop",        sptop},
-  {"spnote",       sporg},
-  {"dcmd",         dcmd},
-  {"ytmcmd",       ytmcmd},
+  /* Designated indices keep IDs aligned even when entries are reordered. */
+  /* ID             name          cmd  */
+  [SpTerm]    = {"spterm",       spterm},
+  [SpFm]      = {"splf",         spfm},
+  [SpCalcu]   = {"spcalcu",      spbc},
+  [SpVol]     = {"spvol",        sppm},
+  [SpTop]     = {"sptop",        sptop},
+  [SpDiscord] = {"dcmd",         dcmd},
+  [SpYtm]     = {"ytmcmd",       ytmcmd},
 };
 
 /* key definitions */
@@ -176,14 +178,21 @@ static const ClientSpecific cs[] = {
 
 static const Key keys[] = {
 	/* modifier                           client keychain    key        function        argument */
-  { MODKEY|ShiftMask,                   0,     -1,         XK_Return, togglesp,       {.v = "spterm" } },
-  { MODKEY,                             0,     XK_s,       XK_f,      togglesp,       {.v = "splf" } },
-  { MODKEY,                             0,     XK_s,       XK_F9,     togglesp,       {.v = "spcalcu" } },
-  { MODKEY|ControlMask,                 0,     -1,         XK_v,      togglesp,       {.v = "spvol" } },
-  { MODKEY,                             0,     -1,         XK_g,      togglesp,       {.v = "sptop" } },
-  { MODKEY,                             0,     XK_s,       XK_n,      togglesp,       {.v = "spnote" } },
-  { MODKEY,                             0,     XK_s,       XK_d,      togglesp,       {.v = "dcmd" } },
-  { MODKEY,                             0,     XK_s,       XK_y,      togglesp,       {.v = "ytmcmd" } },
+  { MODKEY|ShiftMask,                   0,     -1,         XK_Return, togglesp,       {.i = SpTerm } },
+  { MODKEY,                             0,     XK_s,       XK_f,      togglesp,       {.i = SpFm } },
+  { MODKEY,                             0,     XK_s,       XK_F9,     togglesp,       {.i = SpCalcu } },
+  { MODKEY|ControlMask,                 0,     -1,         XK_v,      togglesp,       {.i = SpVol } },
+  { MODKEY,                             0,     -1,         XK_g,      togglesp,       {.i = SpTop} },
+  { MODKEY,                             0,     XK_s,       XK_d,      togglesp,       {.i = SpDiscord} },
+  // { MODKEY,                             0,     XK_s,       XK_y,      togglesp,       {.i = "ytmcmd" } },
+  // { MODKEY|ShiftMask,                   0,     -1,         XK_Return, togglesp,       {.v = "spterm" } },
+  // { MODKEY,                             0,     XK_s,       XK_f,      togglesp,       {.v = "splf" } },
+  // { MODKEY,                             0,     XK_s,       XK_F9,     togglesp,       {.v = "spcalcu" } },
+  // { MODKEY|ControlMask,                 0,     -1,         XK_v,      togglesp,       {.v = "spvol" } },
+  // { MODKEY,                             0,     -1,         XK_g,      togglesp,       {.v = "sptop" } },
+  // { MODKEY,                             0,     XK_s,       XK_n,      togglesp,       {.v = "spnote" } },
+  // { MODKEY,                             0,     XK_s,       XK_d,      togglesp,       {.v = "dcmd" } },
+  // { MODKEY,                             0,     XK_s,       XK_y,      togglesp,       {.v = "ytmcmd" } },
 
   { MODKEY,                             0,     XK_s,       XK_1,      togglesp,       {.ui = 1} }, 
   { MODKEY,                             0,     XK_s,       XK_2,      togglesp,       {.ui = 2} }, 

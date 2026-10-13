@@ -286,6 +286,7 @@ static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void togglefullscr(const Arg *arg);
 static void togglesp(const Arg *arg);
+static void togglespclient(Client *c);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void unfocus(Client *c, int setfocus);
@@ -2622,54 +2623,92 @@ togglefullscr(const Arg *arg)
 }
 
 void
-togglesp(const Arg *arg) 
-{
+togglesp(const Arg *arg) {
   Monitor *m;
   Client *c;
-  unsigned int found = 0, new = 1, i;
+  int id = arg->i;
 
-  for (i = 0; i < LENGTH(scratchpads); i ++) {
-    if (arg->v == scratchpads[i].rule) {
-      new = 0; 
-      break;
-    }
-  }
+  if ( id < 0 || (unsigned int)id >= LENGTH(scratchpads))
+    return;
 
   for (m = mons; m; m = m->next) {
-    if (!new) {
-      for (c = m->clients; c && !(found = c->spnum == i); c = c->next);
-      if (found) break;
-    } else {
-      for (c = m->clients; c && !(found = c->spnew == arg->ui); c = c->next);
-      if (found) break;
+    for (c = m->clients; c; c = c->next) {
+      if (c->spnum == id) {
+        togglespclient(c);
+        return;
+      }
     }
   }
 
-  if (found) {
-    if (m == selmon) {
-      detectfullscr(c, "res");
-      c->tags = ISVISIBLE(c) ? 0 : selmon->tagset[selmon->seltags];
-    } else if (m != selmon) {
-      sendmon(c, selmon);
-    }
-    focus(NULL);
-    arrange(selmon);
-    if (ISVISIBLE(c)) {
-      focus(c);
-      restack(selmon);
-      detectfullscr(c, "hide");
-    }
-  } else {
-    if (!new) {
-      Arg sparg = {.v = scratchpads[i].cmd};
-      spawn(&sparg);
-    } else if (new && selmon->sel) {
-      selmon->sel->spnew = arg->ui;
-      selmon->sel->ignorefs = 1;
-      togglesp(arg);
-    }
-  }
+  Arg spawnarg = {.v = scratchpads[id].cmd };
+  spawn(&spawnarg);
 }
+
+void
+togglespclient(Client *c) {
+  if (c->mon == selmon) {
+    detectfullscr(c, "res");
+    c->tags = ISVISIBLE(c) ? 0 : selmon->tagset[selmon->seltags];
+  } else {
+    sendmon(c, selmon);
+  }
+  focus(NULL);
+  if (ISVISIBLE(c)) {
+    focus(c);
+    detectfullscr(c, "hide");
+  }
+  arrange(selmon);
+}
+
+// void
+// togglesp(const Arg *arg) 
+// {
+//   Monitor *m;
+//   Client *c;
+//   unsigned int found = 0, new = 1, i;
+
+//   for (i = 0; i < LENGTH(scratchpads); i ++) {
+//     if (arg->v == scratchpads[i].rule) {
+//       new = 0; 
+//       break;
+//     }
+//   }
+
+//   for (m = mons; m; m = m->next) {
+//     if (!new) {
+//       for (c = m->clients; c && !(found = c->spnum == i); c = c->next);
+//       if (found) break;
+//     } else {
+//       for (c = m->clients; c && !(found = c->spnew == arg->ui); c = c->next);
+//       if (found) break;
+//     }
+//   }
+
+//   if (found) {
+//     if (m == selmon) {
+//       detectfullscr(c, "res");
+//       c->tags = ISVISIBLE(c) ? 0 : selmon->tagset[selmon->seltags];
+//     } else if (m != selmon) {
+//       sendmon(c, selmon);
+//     }
+//     focus(NULL);
+//     arrange(selmon);
+//     if (ISVISIBLE(c)) {
+//       focus(c);
+//       restack(selmon);
+//       detectfullscr(c, "hide");
+//     }
+//   } else {
+//     if (!new) {
+//       Arg sparg = {.v = scratchpads[i].cmd};
+//       spawn(&sparg);
+//     } else if (new && selmon->sel) {
+//       selmon->sel->spnew = arg->ui;
+//       selmon->sel->ignorefs = 1;
+//       togglesp(arg);
+//     }
+//   }
+// }
 
 void
 toggletag(const Arg *arg)
