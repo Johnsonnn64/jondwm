@@ -151,6 +151,7 @@ struct Monitor {
 	int nmaster;
 	int num;
 	int by, bh;           /* bar geometry */
+  int barx, bary; /* Polybar's offsets relative to its monitor */
 	int mx, my, mw, mh;   /* screen size */
 	int wx, wy, ww, wh;   /* window area  */
 	int gappih;           /* horizontal gap between windows */
@@ -245,6 +246,7 @@ static void moveresizeedge(const Arg *arg);
 static void movemouse(const Arg *arg);
 static Client *nexttiled(Client *c);
 static void pop(Client *c);
+static void positionbar(Monitor *m);
 static void propertynotify(XEvent *e);
 static void quit(const Arg *arg);
 static Monitor *recttomon(int x, int y, int w, int h);
@@ -1551,20 +1553,33 @@ manage(Window w, XWindowAttributes *wa)
 void
 managealtbar(Window win, XWindowAttributes *wa)
 {
-	Monitor *m;
-	if (!(m = recttomon(wa->x, wa->y, wa->width, wa->height)))
-		return;
+    Monitor *m;
 
-	m->barwin = win;
-	m->by = wa->y;
-	bh = m->bh = wa->height;
-	updatebarpos(m);
-	arrange(m);
-	XSelectInput(dpy, win, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
-	XMoveResizeWindow(dpy, win, wa->x, m->by, wa->width, wa->height);
-	XMapWindow(dpy, win);
-	XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend,
-		(unsigned char *) &win, 1);
+    if (!(m = recttomon(wa->x, wa->y,
+                        wa->width, wa->height)))
+        return;
+
+    m->barwin = win;
+
+    /* Save original Polybar offsets */
+    m->barx = wa->x - m->mx;
+    m->bary = wa->y - m->my;
+
+    bh = m->bh = wa->height;
+
+    updatebarpos(m);
+    arrange(m);
+
+    XSelectInput(dpy, win,
+                 EnterWindowMask | FocusChangeMask |
+                 PropertyChangeMask | StructureNotifyMask);
+
+    positionbar(m);
+    XMapWindow(dpy, win);
+
+    XChangeProperty(dpy, root, netatom[NetClientList],
+                    XA_WINDOW, 32, PropModeAppend,
+                    (unsigned char *)&win, 1);
 }
 
 void
@@ -1849,6 +1864,26 @@ pop(Client *c)
 	attach(c);
 	focus(c);
 	arrange(c->mon);
+}
+
+void
+positionbar(Monitor *m)
+{
+    if (!m->barwin)
+        return;
+
+    if (usealtbar) {
+        int x = m->mx + m->barx;
+        int y = m->showbar
+              ? m->my + m->bary
+              : -m->bh - 1;
+
+        /* Preserve Polybar's own width and height */
+        XMoveWindow(dpy, m->barwin, x, y);
+    } else {
+        XMoveResizeWindow(dpy, m->barwin,
+                          m->wx, m->by, m->ww, m->bh);
+    }
 }
 
 void
@@ -2717,21 +2752,35 @@ updatebarvisibility(Monitor *m)
 		return;
 	m->showbar = visible;
 	updatebarpos(m);
-	if (m->barwin)
-		XMoveResizeWindow(dpy, m->barwin, m->wx, m->by, m->ww, m->bh);
+  positionbar(m);
 }
 
 void
 updatebarpos(Monitor *m)
 {
-	m->wy = m->my;
-	m->wh = m->mh;
-	if (m->showbar) {
-		m->wh -= m->bh;
-		m->by = m->topbar ? m->wy : m->wy + m->wh;
-		m->wy = m->topbar ? m->wy + m->bh : m->wy;
-	} else
-		m->by = -m->bh;
+    m->wy = m->my;
+    m->wh = m->mh;
+
+    if (m->showbar) {
+        int reserved = m->bh;
+
+        /* Include Polybar's top offset */
+        if (usealtbar && m->barwin && m->topbar)
+            reserved += MAX(0, m->bary);
+
+        reserved = MIN(reserved, m->mh);
+
+        m->wh -= reserved;
+
+        m->by = m->topbar
+              ? m->wy
+              : m->wy + m->wh;
+
+        if (m->topbar)
+            m->wy += reserved;
+    } else {
+        m->by = -m->bh;
+    }
 }
 
 void
