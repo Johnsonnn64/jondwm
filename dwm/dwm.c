@@ -1863,6 +1863,43 @@ propertynotify(XEvent *e)
 	}
 }
 
+static void
+publishtags(Monitor *m)
+{
+  char name[64];
+  char states[LENGTH(tags)];
+  unsigned int i, occ = 0, urg = 0;
+  Client *c;
+
+  for (c = m->clients; c; c = c->next) {
+    occ |= c->tags;
+    if (c->isurgent)
+      urg |= c->tags;
+  }
+
+  for (i = 0; i < LENGTH(tags); i++) {
+    unsigned int bit = 1U << i;
+
+    int active = m->tagset[m->seltags] & bit;
+    int occupied = occ & bit;
+    int isurgent = urg & bit;
+
+    if (isurgent)
+      states[i] = active ? 'U' : 'u';
+    else if (active)
+      states[i] = occupied ? 'A' : 'a';
+    else
+      states[i] = occupied ? 'o' : 'e';
+  }
+
+  snprintf(name, sizeof(name), "_DWM_TAGS_%d", m->num);
+
+  XChangeProperty(dpy, root,
+      XInternAtom(dpy, name, False),
+      XA_STRING, 8, PropModeReplace,
+      (unsigned char *)states, LENGTH(tags));
+}
+
 void
 quit(const Arg *arg)
 {

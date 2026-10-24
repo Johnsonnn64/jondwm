@@ -56,7 +56,7 @@ static Sp scratchpads[] = {
 };
 
 /* tagging */
-static char *tags[] = {"1", "2", "3", "4", "5", "6", "7"};
+static char *tags[] = {"󰮯", "󰧞", "󰑊", "󰧞", "󰑊", "󰧞", "󰑊", "󰧞"};
 
 static const FullscreenRule fullscreenrules[] = {
 	/* class         instance    title    ignorefs */
