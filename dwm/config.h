@@ -27,7 +27,7 @@ static const char *colors[][3]      = {
 };
 
 /* SpNone must remain zero; IDs are shared by rules, commands and bindings. */
-enum { SpTerm, SpFm, SpCalcu, SpVol, SpTop, SpDiscord, YtMsc};
+enum { SpNone, SpTerm, SpFm, SpCalcu, SpVol, SpTop, SpDiscord, YtMsc};
 
 typedef struct {
   char *rule;
@@ -70,14 +70,13 @@ static const Rule rules[] = {
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class     instance  title           tags mask  iscentered  isfloating  isterminal  noswallow  monitor */
-  // class           instance   title           tags centered floating terminal noswal mon spnum ignorefs
-  { "st-256color",   NULL,      NULL,           0,   0,       0,       1,       0,     -1, -1 },
-  { "Alacritty",     NULL,      NULL,           0,   0,       0,       1,       0,     -1, -1 },
-  { "Dragon-drop",   NULL,      NULL,           ~0,  1,       1,       0,       1,     -1, -1 },
-  { NULL,            NULL,      "Event Tester", 0,   0,       0,       0,       1,     -1, -1 },
-  { NULL,            "fcen",    NULL,           0,   1,       1,       0,       1,     -1, -1 },
-  { NULL,            "fl",      NULL,           0,   0,       1,       0,       1,     -1, -1 },
+  /* class           instance   title           tags centered floating terminal noswal monitor spnum */
+  { "st-256color",   NULL,      NULL,           0,   0,       0,       1,       0,     -1, SpNone },
+  { "Alacritty",     NULL,      NULL,           0,   0,       0,       1,       0,     -1, SpNone },
+  { "Dragon-drop",   NULL,      NULL,           ~0,  1,       1,       0,       1,     -1, SpNone },
+  { NULL,            NULL,      "Event Tester", 0,   0,       0,       0,       1,     -1, SpNone },
+  { NULL,            "fcen",    NULL,           0,   1,       1,       0,       1,     -1, SpNone },
+  { NULL,            "fl",      NULL,           0,   0,       1,       0,       1,     -1, SpNone },
 
   /* scratchpads: use the same enum ID here and in scratchpads[] */
   { NULL,		         "spterm",	NULL,	          0,	 1,       1,			 1,       0,     -1, SpTerm },
@@ -92,13 +91,13 @@ static const Rule rules[] = {
 /* layout(s) */
 static const float mfact     = 0.45; /* factor of master area size [0.05..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
-static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
+static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
 static const int refreshrate = 120;  /* refresh rate (per second) for client move/resize */
 
 static const LayoutMonitorRule lm_rules[] = {
 	/* >=w, >=h, req'd layout, new nmaster, new mfact */
-	{ 0, 2000,   1,            0,           0.50 },
+	{ 0, 2000,   0,            0,           0.50 },
 };
 
 #define FORCE_VSPLIT 1  /* nrowgrid layout: force two clients to always split vertically */
@@ -124,7 +123,6 @@ static const Layout layouts[] = {
 static const char dmenuln[] = "10";
 static const char dmenulh[] = "50";
 static const char dmenuwidth[] = "700";
-static const char dmenufont[] = "JetBrainsMono Nerd Font:style=Regular:size=15:antialias=true";
 static char dmenux[12];
 static char dmenuy[12];
 #define DMENUS(NAME,CMD) \
