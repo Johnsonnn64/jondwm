@@ -1,5 +1,14 @@
 /* See LICENSE file for copyright and license details. */
 
+/* Windows allowed above a custom fullscreen window.
+ * Kept separate from Rule so this patch can be used without scratchpads. */
+static const FullscreenRule fullscreenrules[] = {
+	/* class         instance    title    ignorefs */
+	{ NULL,          "spterm",   NULL,    1 },
+	{ NULL,          "spcalc",   NULL,    1 },
+	{ "Dragon-drop", NULL,       NULL,    1 },
+};
+
 /* appearance */
 static const unsigned int borderpx  = 3;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
@@ -24,6 +33,37 @@ static const char *colors[][3]      = {
 	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
 };
 
+/* SpNone must remain zero; IDs are shared by rules, commands and bindings. */
+enum { SpTerm, SpFm, SpCalcu, SpVol, SpTop, SpDiscord, YtMsc};
+static const char *sptermcmd[] = { "st", "-n", "spterm", NULL };
+static const char *spcalccmd[] = { "st", "-n", "spcalc", "-e", "bc", "-lq", NULL };
+
+typedef struct {
+  char *rule;
+  const void *cmd;
+} Sp;
+
+const char *spterm[] = {"alacritty", "--class=spterm", "-o", "window.dimensions.columns=125", "window.dimensions.lines=34", NULL };
+const char *spfm[] = {"alacritty", "--class=spfm", "-o", "window.dimensions.columns=110", "window.dimensions.lines=33", "-e", "lfrun", NULL };
+const char *spbc[] = {"alacritty", "--class=spcalcu", "-o", "window.dimensions.columns=80", "window.dimensions.lines=30", "-e", "bc", "-lq", NULL };
+const char *sppm[] = {"alacritty", "--class=spvol", "-o", "window.dimensions.columns=100", "window.dimensions.lines=15", "-e", "pulsemixer", NULL };
+const char *sptop[] = {"alacritty", "--class=sptop", "-o", "window.dimensions.columns=115", "window.dimensions.lines=35", "-e", "btop", NULL };
+const char *ytmsc[] = {"alacritty", "--class=ytmsc", "-o", "window.dimensions.columns=125", "window.dimensions.lines=35", "-e", "ytmusic-tui", NULL };
+
+const char *dcmd[] = {"discord", NULL };
+
+static Sp scratchpads[] = {
+  /* Designated indices keep IDs aligned even when entries are reordered. */
+  /* ID             name          cmd  */
+  [SpTerm]    = {"spterm",       spterm},
+  [SpFm]      = {"splf",         spfm},
+  [SpCalcu]   = {"spcalcu",      spbc},
+  [SpVol]     = {"spvol",        sppm},
+  [SpTop]     = {"sptop",        sptop},
+  [YtMsc]     = {"ytmsc",        ytmsc},
+  [SpDiscord] = {"dcmd",         dcmd},
+};
+
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "7", "8", "9", "0" };
 
@@ -33,8 +73,22 @@ static const Rule rules[] = {
 	 *	WM_NAME(STRING) = title
 	 */
 	/* class     instance  title           tags mask  iscentered  isfloating  isterminal  noswallow  monitor */
-	{ "St",      NULL,     NULL,           0,         0,          0,          1,           0,        -1 },
-	{ NULL,      NULL,     "Event Tester", 0,         0,          0,          0,           1,        -1 }, /* xev */
+  // class           instance   title           tags centered floating terminal noswal mon spnum ignorefs
+  { "st-256color",   NULL,      NULL,           0,   0,       0,       1,       0,     -1, -1 },
+  { "Alacritty",     NULL,      NULL,           0,   0,       0,       1,       0,     -1, -1 },
+  { "Dragon-drop",   NULL,      NULL,           ~0,  1,       1,       0,       1,     -1, -1 },
+  { NULL,            NULL,      "Event Tester", 0,   0,       0,       0,       1,     -1, -1 },
+  { NULL,            "fcen",    NULL,           0,   1,       1,       0,       1,     -1, -1 },
+  { NULL,            "fl",      NULL,           0,   0,       1,       0,       1,     -1, -1 },
+
+  /* scratchpads: use the same enum ID here and in scratchpads[] */
+  { NULL,		         "spterm",	NULL,	          0,	 1,       1,			 1,       0,     -1, SpTerm },
+  { NULL,		         "spfm",	  NULL,	          0,	 1,       1,			 1,       0,     -1, SpFm },
+  { NULL,		         "spcalcu", NULL,	          0,	 1,       1,			 0,       0,     -1, SpCalcu },
+  { NULL,		         "spvol",   NULL,	          0,	 1,       1,			 0,       0,     -1, SpVol },
+  { NULL,		         "sptop",   NULL,	          0,	 1,       1,			 0,       0,     -1, SpTop },
+  { NULL,		         "ytmsc",   NULL,	          0,	 1,       1,			 0,       0,     -1, YtMsc },
+  { "discord",       NULL,      NULL,           0,   1,       1,       0,       0,     -1, SpDiscord },
 };
 
 /* layout(s) */
@@ -60,11 +114,6 @@ static const Layout layouts[] = {
 	{ "[M]",      monocle },
 };
 
-typedef struct {
-  char *rule;
-  const void *cmd;
-} Sp;
-
 /* key definitions */
 #define MODKEY Mod1Mask
 #define TAGKEYS(KEY,TAG) \
@@ -86,49 +135,59 @@ static const char *termcmd[]  = { "alacritty", NULL };
 
 static const Keychord *keychords[] = {
 	/* modifier                     key        function        argument */
-	&((Keychord){1, {{MODKEY,                       XK_p}},      spawn,          {.v = dmenucmd } }),
-	&((Keychord){1, {{MODKEY|ShiftMask,             XK_Return}}, spawn,          {.v = termcmd } }),
-	&((Keychord){1, {{MODKEY,                       XK_b}},      togglebar,      {0} }),
-	&((Keychord){1, {{MODKEY,                       XK_j}},      focusstack,     {.i = +1 } }),
-	&((Keychord){1, {{MODKEY,                       XK_k}},      focusstack,     {.i = -1 } }),
-	&((Keychord){1, {{MODKEY,                       XK_i}},      incnmaster,     {.i = +1 } }),
-	&((Keychord){1, {{MODKEY,                       XK_d}},      incnmaster,     {.i = -1 } }),
-	&((Keychord){1, {{MODKEY,                       XK_Down}},   moveresize,     {.v = "0x 25y 0w 0h" } }),
-	&((Keychord){1, {{MODKEY,                       XK_Up}},     moveresize,     {.v = "0x -25y 0w 0h" } }),
-	&((Keychord){1, {{MODKEY,                       XK_Right}},  moveresize,     {.v = "25x 0y 0w 0h" } }),
-	&((Keychord){1, {{MODKEY,                       XK_Left}},   moveresize,     {.v = "-25x 0y 0w 0h" } }),
-	&((Keychord){1, {{MODKEY|ShiftMask,             XK_Down}},   moveresize,     {.v = "0x 0y 0w 25h" } }),
-	&((Keychord){1, {{MODKEY|ShiftMask,             XK_Up}},     moveresize,     {.v = "0x 0y 0w -25h" } }),
-	&((Keychord){1, {{MODKEY|ShiftMask,             XK_Right}},  moveresize,     {.v = "0x 0y 25w 0h" } }),
-	&((Keychord){1, {{MODKEY|ShiftMask,             XK_Left}},   moveresize,     {.v = "0x 0y -25w 0h" } }),
-	&((Keychord){1, {{MODKEY|ControlMask,           XK_Up}},     moveresizeedge, {.v = "t"} }),
-	&((Keychord){1, {{MODKEY|ControlMask,           XK_Down}},   moveresizeedge, {.v = "b"} }),
-	&((Keychord){1, {{MODKEY|ControlMask,           XK_Left}},   moveresizeedge, {.v = "l"} }),
-	&((Keychord){1, {{MODKEY|ControlMask,           XK_Right}},  moveresizeedge, {.v = "r"} }),
+  &((Keychord){1, {{ MODKEY|ShiftMask, XK_Return}},   togglesp,       {.i = SpTerm } }),
+  &((Keychord){2, {{ MODKEY, XK_s}, {0, XK_f}},       togglesp,       {.i = SpFm } }),
+  &((Keychord){2, {{ MODKEY, XK_s}, {0, XK_F9}},      togglesp,       {.i = SpCalcu } }),
+  &((Keychord){1, {{ MODKEY|ControlMask, XK_v}},      togglesp,       {.i = SpVol } }),
+  &((Keychord){1, {{ MODKEY, XK_g}},                  togglesp,       {.i = SpTop} }),
+  &((Keychord){2, {{ MODKEY, XK_s}, {0, XK_d}},       togglesp,       {.i = SpDiscord} }),
+  &((Keychord){2, {{ MODKEY, XK_s}, {0, XK_y}},       togglesp,       {.i = YtMsc } }),
+
+
+	&((Keychord){1, {{MODKEY, XK_p}},      spawn,          {.v = dmenucmd } }),
+	&((Keychord){1, {{MODKEY, XK_r}},      spawn,          {.v = termcmd } }),
+	&((Keychord){1, {{MODKEY, XK_b}},      togglebar,      {0} }),
+	&((Keychord){1, {{MODKEY, XK_j}},      focusstack,     {.i = +1 } }),
+	&((Keychord){1, {{MODKEY, XK_k}},      focusstack,     {.i = -1 } }),
+	&((Keychord){1, {{MODKEY, XK_i}},      incnmaster,     {.i = +1 } }),
+	&((Keychord){1, {{MODKEY, XK_d}},      incnmaster,     {.i = -1 } }),
+	&((Keychord){1, {{MODKEY, XK_Down}},   moveresize,     {.v = "0x 25y 0w 0h" } }),
+	&((Keychord){1, {{MODKEY, XK_Up}},     moveresize,     {.v = "0x -25y 0w 0h" } }),
+	&((Keychord){1, {{MODKEY, XK_Right}},  moveresize,     {.v = "25x 0y 0w 0h" } }),
+	&((Keychord){1, {{MODKEY, XK_Left}},   moveresize,     {.v = "-25x 0y 0w 0h" } }),
+	&((Keychord){1, {{MODKEY|ShiftMask, XK_Down}},   moveresize,     {.v = "0x 0y 0w 25h" } }),
+	&((Keychord){1, {{MODKEY|ShiftMask, XK_Up}},     moveresize,     {.v = "0x 0y 0w -25h" } }),
+	&((Keychord){1, {{MODKEY|ShiftMask, XK_Right}},  moveresize,     {.v = "0x 0y 25w 0h" } }),
+	&((Keychord){1, {{MODKEY|ShiftMask, XK_Left}},   moveresize,     {.v = "0x 0y -25w 0h" } }),
+	&((Keychord){1, {{MODKEY|ControlMask, XK_Up}},     moveresizeedge, {.v = "t"} }),
+	&((Keychord){1, {{MODKEY|ControlMask, XK_Down}},   moveresizeedge, {.v = "b"} }),
+	&((Keychord){1, {{MODKEY|ControlMask, XK_Left}},   moveresizeedge, {.v = "l"} }),
+	&((Keychord){1, {{MODKEY|ControlMask, XK_Right}},  moveresizeedge, {.v = "r"} }),
 	&((Keychord){1, {{MODKEY|ControlMask|ShiftMask, XK_Up}},     moveresizeedge, {.v = "T"} }),
 	&((Keychord){1, {{MODKEY|ControlMask|ShiftMask, XK_Down}},   moveresizeedge, {.v = "B"} }),
 	&((Keychord){1, {{MODKEY|ControlMask|ShiftMask, XK_Left}},   moveresizeedge, {.v = "L"} }),
 	&((Keychord){1, {{MODKEY|ControlMask|ShiftMask, XK_Right}},  moveresizeedge, {.v = "R"} }),
-	&((Keychord){1, {{MODKEY,                       XK_h}},      setmfact,       {.f = -0.05} }),
-	&((Keychord){1, {{MODKEY,                       XK_l}},      setmfact,       {.f = +0.05} }),
-	&((Keychord){1, {{MODKEY|ShiftMask,             XK_h}},      setcfact,       {.f = +0.25} }),
-	&((Keychord){1, {{MODKEY|ShiftMask,             XK_l}},      setcfact,       {.f = -0.25} }),
-	&((Keychord){1, {{MODKEY|ShiftMask,             XK_o}},      setcfact,       {.f =  0.00} }),
-	&((Keychord){1, {{MODKEY,                       XK_Return}}, zoom,           {0} }),
-	&((Keychord){1, {{MODKEY,                       XK_Tab}},    view,           {0} }),
-	&((Keychord){1, {{MODKEY|ShiftMask,             XK_c}},      killclient,     {0} }),
-	&((Keychord){1, {{MODKEY,                       XK_t}},      setlayout,      {.v = &layouts[0]} }),
-	&((Keychord){1, {{MODKEY,                       XK_f}},      setlayout,      {.v = &layouts[1]} }),
-	&((Keychord){1, {{MODKEY,                       XK_m}},      setlayout,      {.v = &layouts[2]} }),
-	&((Keychord){1, {{MODKEY,                       XK_space}},  setlayout,      {0} }),
-	&((Keychord){1, {{MODKEY|ShiftMask,             XK_space}},  togglefloating, {0} }),
-	&((Keychord){1, {{MODKEY|ShiftMask,             XK_f}},      togglefullscr,  {0} }),
-	&((Keychord){1, {{MODKEY,                       XK_0}},      view,           {.ui = ~0 } }),
-	&((Keychord){1, {{MODKEY|ShiftMask,             XK_0}},      tag,            {.ui = ~0 } }),
-	&((Keychord){1, {{MODKEY,                       XK_comma}},  focusmon,       {.i = -1 } }),
-	&((Keychord){1, {{MODKEY,                       XK_period}}, focusmon,       {.i = +1 } }),
-	&((Keychord){1, {{MODKEY|ShiftMask,             XK_comma}},  tagmon,         {.i = -1 } }),
-	&((Keychord){1, {{MODKEY|ShiftMask,             XK_period}}, tagmon,         {.i = +1 } }),
+	&((Keychord){1, {{MODKEY, XK_h}},      setmfact,       {.f = -0.05} }),
+	&((Keychord){1, {{MODKEY, XK_l}},      setmfact,       {.f = +0.05} }),
+	&((Keychord){1, {{MODKEY|ShiftMask, XK_h}},      setcfact,       {.f = +0.25} }),
+	&((Keychord){1, {{MODKEY|ShiftMask, XK_l}},      setcfact,       {.f = -0.25} }),
+	&((Keychord){1, {{MODKEY|ShiftMask, XK_o}},      setcfact,       {.f =  0.00} }),
+	&((Keychord){1, {{MODKEY, XK_Return}}, zoom,           {0} }),
+	&((Keychord){1, {{MODKEY, XK_Tab}},    view,           {0} }),
+	&((Keychord){1, {{MODKEY, XK_q}},      killclient,     {0} }),
+	&((Keychord){1, {{MODKEY, XK_t}},      setlayout,      {.v = &layouts[0]} }),
+	&((Keychord){1, {{MODKEY, XK_f}},      setlayout,      {.v = &layouts[1]} }),
+	&((Keychord){1, {{MODKEY, XK_m}},      setlayout,      {.v = &layouts[2]} }),
+	&((Keychord){1, {{MODKEY, XK_space}},  setlayout,      {0} }),
+	&((Keychord){1, {{MODKEY|ShiftMask, XK_space}},  togglefloating, {0} }),
+	&((Keychord){1, {{MODKEY|ShiftMask, XK_f}},      togglefullscr,  {0} }),
+	&((Keychord){1, {{MODKEY, XK_0}},      view,           {.ui = ~0 } }),
+	&((Keychord){1, {{MODKEY|ShiftMask, XK_0}},      tag,            {.ui = ~0 } }),
+	&((Keychord){1, {{MODKEY, XK_comma}},  focusmon,       {.i = -1 } }),
+	&((Keychord){1, {{MODKEY, XK_period}}, focusmon,       {.i = +1 } }),
+	&((Keychord){1, {{MODKEY|ShiftMask, XK_comma}},  tagmon,         {.i = -1 } }),
+	&((Keychord){1, {{MODKEY|ShiftMask, XK_period}}, tagmon,         {.i = +1 } }),
+	&((Keychord){1, {{MODKEY, XK_f}}, togglefullscr,         {0} }),
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
