@@ -98,7 +98,7 @@ static const int refreshrate = 120;  /* refresh rate (per second) for client mov
 
 static const LayoutMonitorRule lm_rules[] = {
 	/* >=w, >=h, req'd layout, new nmaster, new mfact */
-	{ 0, 2000,   0,            0,           0.50 },
+	{ 0, 2000,   1,            0,           0.50 },
 };
 
 #define FORCE_VSPLIT 1  /* nrowgrid layout: force two clients to always split vertically */
@@ -187,8 +187,6 @@ static const Keychord *keychords[] = {
 	&((Keychord){1, {{MODKEY, XK_space}},  setlayout,      {0} }),
 	&((Keychord){1, {{MODKEY|ShiftMask, XK_space}},  togglefloating, {0} }),
 	&((Keychord){1, {{MODKEY|ShiftMask, XK_f}},      togglefullscr,  {0} }),
-	&((Keychord){1, {{MODKEY, XK_0}},      view,           {.ui = ~0 } }),
-	&((Keychord){1, {{MODKEY|ShiftMask, XK_0}},      tag,            {.ui = ~0 } }),
 	&((Keychord){1, {{MODKEY, XK_comma}},  focusnthmon,       {.i = 1 } }),
 	&((Keychord){1, {{MODKEY, XK_period}}, focusnthmon,       {.i = 0 } }),
 	&((Keychord){1, {{MODKEY|ShiftMask, XK_comma}},  tagnthmon,         {.i = 1 } }),
