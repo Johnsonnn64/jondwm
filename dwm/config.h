@@ -125,8 +125,9 @@ static const char dmenulh[] = "50";
 static const char dmenuwidth[] = "700";
 static char dmenux[12];
 static char dmenuy[12];
+static char dmenumon[12];
 #define DMENUS(NAME,CMD) \
-  static const char *NAME[] = { CMD, "-x", dmenux, "-y", dmenuy, "-z", dmenuwidth, "-h", dmenulh, "-l", dmenuln,  NULL };
+  static const char *NAME[] = { CMD, "-m", dmenumon, "-x", dmenux, "-y", dmenuy, "-z", dmenuwidth, "-h", dmenulh, "-l", dmenuln,  NULL };
 
 DMENUS(dmenucmd,   "dmenu_run")
 DMENUS(clipcmd,    "clipmenu")

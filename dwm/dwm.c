@@ -2433,8 +2433,9 @@ spawn(const Arg *arg)
 	struct sigaction sa;
 
   if (arg->v != NULL) {
+    snprintf(dmenumon, sizeof dmenumon, "%d", selmon->num);
     snprintf(dmenux, sizeof dmenux, "%d", (selmon->mw - atoi(dmenuwidth)) / 2);
-    snprintf(dmenuy, sizeof dmenux, "%d", (selmon->mh - atoi(dmenulh) * (atoi(dmenuln) + 1)) / 2);
+    snprintf(dmenuy, sizeof dmenuy, "%d", (selmon->mh - atoi(dmenulh) * (atoi(dmenuln) + 1)) / 2);
   }
 
 	if (fork() == 0) {
