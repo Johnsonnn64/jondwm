@@ -1910,6 +1910,7 @@ propertynotify(XEvent *e)
 			break;
 		case XA_WM_HINTS:
 			updatewmhints(c);
+      publishtags(c->mon);
 			drawbars();
 			break;
 		}
