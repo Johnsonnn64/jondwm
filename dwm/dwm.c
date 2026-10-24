@@ -161,7 +161,6 @@ struct Monitor {
 	unsigned int sellt;
 	unsigned int tagset[2];
 	int showbar;
-	int showbaruser;       /* user preference while fullscreen hides the bar */
 	int topbar;
 	Client *clients;
 	Client *sel;
@@ -934,7 +933,7 @@ createmon(void)
 	m->tagset[0] = m->tagset[1] = 1;
 	m->mfact = mfact;
 	m->nmaster = nmaster;
-	m->showbar = m->showbaruser = showbar;
+	m->showbar = showbar;
 	m->topbar = topbar;
   m->bh = bh;
 	m->gappih = gappih;
@@ -1558,7 +1557,7 @@ managealtbar(Window win, XWindowAttributes *wa)
 	updatebarpos(m);
 	arrange(m);
 	XSelectInput(dpy, win, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
-	XMoveResizeWindow(dpy, win, wa->x, wa->y, wa->width, wa->height);
+	XMoveResizeWindow(dpy, win, wa->x, m->by, wa->width, wa->height);
 	XMapWindow(dpy, win);
 	XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend,
 		(unsigned char *) &win, 1);
@@ -2466,7 +2465,6 @@ togglebar(const Arg *arg)
 {
 	selmon->pertag->showbars[selmon->pertag->curtag] =
 		!selmon->pertag->showbars[selmon->pertag->curtag];
-	XMoveResizeWindow(dpy, selmon->barwin, selmon->wx, selmon->by, selmon->ww, selmon->bh);
 	arrange(selmon);
 }
 
@@ -2537,9 +2535,6 @@ toggleview(const Arg *arg)
 		selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
 		selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
 		selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
-
-		if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
-			togglebar(NULL);
 
 		focus(NULL);
 		arrange(selmon);
@@ -2706,7 +2701,8 @@ void
 updatebarvisibility(Monitor *m)
 {
 	Client *c;
-	int visible = m->showbaruser;
+	/* Fullscreen overrides visibility without changing the saved tag preference. */
+	int visible = m->pertag->showbars[m->pertag->curtag];
 
 	for (c = m->clients; c; c = c->next)
 		if (c->fullscreenisolated && ISVISIBLE(c) && !HIDDEN(c)) {
@@ -2717,7 +2713,8 @@ updatebarvisibility(Monitor *m)
 		return;
 	m->showbar = visible;
 	updatebarpos(m);
-	XMoveResizeWindow(dpy, m->barwin, m->wx, m->by, m->ww, bh);
+	if (m->barwin)
+		XMoveResizeWindow(dpy, m->barwin, m->wx, m->by, m->ww, m->bh);
 }
 
 void
@@ -2985,9 +2982,6 @@ view(const Arg *arg)
 	selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
 	selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
 	selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
-
-	if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
-		togglebar(NULL);
 
 	focus(selmon->pertag->sel[selmon->pertag->curtag]);
 	arrange(selmon);
