@@ -52,7 +52,7 @@ static const unsigned int ulinevoffset	= 4;	/* how far above the bottom of the b
 static const int ulineall 		= 0;	/* 1 to show underline on all tags, 0 for just the active ones */
 
 /* Shared scratchpad IDs for rules and designated scratchpads[] entries. */
-enum { SpTerm, SpFm, SpCalcu, SpVol, SpTop, SpDiscord, SpYtm };
+enum { SpTerm, SpFm, SpCalcu, SpVol, SpTop, SpDiscord, YtMsc};
 
 static const Rule rules[] = {
   /*xprop(1):
@@ -73,8 +73,8 @@ static const Rule rules[] = {
   { NULL,		         "spcalcu", NULL,	          0,	 1,       1,			 0,       0,     -1, SpCalcu,   1 },
   { NULL,		         "spvol",   NULL,	          0,	 1,       1,			 0,       0,     -1, SpVol,     1 },
   { NULL,		         "sptop",   NULL,	          0,	 1,       1,			 0,       0,     -1, SpTop,     1 },
+  { NULL,		         "ytmsc",   NULL,	          0,	 1,       1,			 0,       0,     -1, YtMsc,     1 },
   { "discord",       NULL,      NULL,           0,   1,       1,       0,       0,     -1, SpDiscord, 1 },
-  // { "com.github.th_ch.youtube_music", NULL,      NULL,           0,   1,       1,       0,       0,     -1, SpYtm,     1 },
 };
 
 /* layout(s) */
@@ -116,10 +116,9 @@ const char *spfm[] = {"alacritty", "--class=spfm", "-o", "window.dimensions.colu
 const char *spbc[] = {"alacritty", "--class=spcalcu", "-o", "window.dimensions.columns=80", "window.dimensions.lines=30", "-e", "bc", "-lq", NULL };
 const char *sppm[] = {"alacritty", "--class=spvol", "-o", "window.dimensions.columns=100", "window.dimensions.lines=15", "-e", "pulsemixer", NULL };
 const char *sptop[] = {"alacritty", "--class=sptop", "-o", "window.dimensions.columns=115", "window.dimensions.lines=35", "-e", "btop", NULL };
-const char *sporg[] = {"alacritty", "--class=spnote", "-o", "window.dimensions.columns=84", "window.dimensions.lines=34", "-e", "nvim", "+3", "-c", "cd ~/personal/org", "/home/john/personal/org/index.org", NULL };
+const char *ytmsc[] = {"alacritty", "--class=ytmsc", "-o", "window.dimensions.columns=125", "window.dimensions.lines=35", "-e", "ytmusic-tui", NULL };
 
 const char *dcmd[] = {"discord", NULL };
-const char *ytmcmd[] = {"youtube-music", NULL };
 
 static Sp scratchpads[] = {
   /* Designated indices keep IDs aligned even when entries are reordered. */
@@ -129,8 +128,8 @@ static Sp scratchpads[] = {
   [SpCalcu]   = {"spcalcu",      spbc},
   [SpVol]     = {"spvol",        sppm},
   [SpTop]     = {"sptop",        sptop},
+  [YtMsc]     = {"ytmsc",        ytmsc},
   [SpDiscord] = {"dcmd",         dcmd},
-  [SpYtm]     = {"ytmcmd",       ytmcmd},
 };
 
 /* key definitions */
@@ -161,6 +160,7 @@ DMENUS(wikicmd,    "wikimenu")
 DMENUS(scrcmd,     "scrmenu")
 DMENUS(powermenu,  "power.sh")
 DMENUS(btmenu,     "bluetoothdmenu.sh")
+DMENUS(screenshot, "screenshot")
 
 /* commands */
 static const char *termcmd[]  = { "alacritty", NULL };
@@ -184,7 +184,7 @@ static const Key keys[] = {
   { MODKEY|ControlMask,                 0,     -1,         XK_v,      togglesp,       {.i = SpVol } },
   { MODKEY,                             0,     -1,         XK_g,      togglesp,       {.i = SpTop} },
   { MODKEY,                             0,     XK_s,       XK_d,      togglesp,       {.i = SpDiscord} },
-  // { MODKEY,                             0,     XK_s,       XK_y,      togglesp,       {.i = "ytmcmd" } },
+  { MODKEY,                             0,     XK_s,       XK_y,      togglesp,       {.i = YtMsc } },
   // { MODKEY|ShiftMask,                   0,     -1,         XK_Return, togglesp,       {.v = "spterm" } },
   // { MODKEY,                             0,     XK_s,       XK_f,      togglesp,       {.v = "splf" } },
   // { MODKEY,                             0,     XK_s,       XK_F9,     togglesp,       {.v = "spcalcu" } },
@@ -272,7 +272,7 @@ static const Key keys[] = {
   { MODKEY,                             0,     -1,  XK_F10,    spawn,          SHCMD("playerctl play-pause") },
   { MODKEY,                             0,     -1,  XK_F11,    spawn,          SHCMD("playerctl previous") },
   { MODKEY,                             0,     -1,  XK_F12,    spawn,          SHCMD("playerctl next") },
-  { 0,                                  0,     -1,  XK_Print,  spawn,          SHCMD("screenshot") },
+  { 0,                                  0,     -1,  XK_Print,  spawn,          {.v = screenshot} },
   { ControlMask,                        0,		 -1, 	XF86XK_AudioMute,   spawn,          SHCMD("playerctl play-pause") },
 
   { 0,                                  1,     -1,  XK_1,      spawn,          SHCMD("bluearchive one")},
