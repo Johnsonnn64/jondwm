@@ -2331,8 +2331,11 @@ spawn(const Arg *arg)
 {
 	struct sigaction sa;
 
-	if (arg->v == dmenucmd)
-		dmenumon[0] = '0' + selmon->num;
+  if (arg->v != NULL) {
+    snprintf(dmenux, sizeof dmenux, "%d", (selmon->mw - atoi(dmenuwidth)) / 2);
+    snprintf(dmenuy, sizeof dmenux, "%d", (selmon->mh - atoi(dmenulh) * (atoi(dmenuln) + 1)) / 2);
+  }
+
 	if (fork() == 0) {
 		if (dpy)
 			close(ConnectionNumber(dpy));

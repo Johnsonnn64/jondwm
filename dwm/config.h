@@ -2,13 +2,6 @@
 
 /* Windows allowed above a custom fullscreen window.
  * Kept separate from Rule so this patch can be used without scratchpads. */
-static const FullscreenRule fullscreenrules[] = {
-	/* class         instance    title    ignorefs */
-	{ NULL,          "spterm",   NULL,    1 },
-	{ NULL,          "spcalc",   NULL,    1 },
-	{ "Dragon-drop", NULL,       NULL,    1 },
-};
-
 /* appearance */
 static const unsigned int borderpx  = 3;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
@@ -23,23 +16,18 @@ static const int topbar             = 1;        /* 0 means bottom bar */
 static const int usealtbar          = 1;        /* 1 means use non-dwm status bar */
 static const char *altbarclass      = "Polybar"; /* Alternate bar class name */
 static const char *altbarcmd        = "$HOME/bar.sh"; /* Alternate bar launch command */
-static const char *fonts[]          = { "monospace:size=10" };
-static const char dmenufont[]       = "monospace:size=10";
-static const char col_gray1[]       = "#222222";
-static const char col_gray2[]       = "#444444";
-static const char col_gray3[]       = "#bbbbbb";
-static const char col_gray4[]       = "#eeeeee";
-static const char col_cyan[]        = "#005577";
+static const char *fonts[]          = { "JetBrainsMono Nerd Font:style=Regular:size=11.5:antialias=true" };
+static const char base[]       = "#1E1E2E";
+static const char gray2[]       = "#313244"; // unfocused window border
+static const char peach[]      = "#fab387";
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
-	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
+  [SchemeNorm]       = { peach,          base,     gray2 },
+  [SchemeSel]        = { peach,          base,     peach },
 };
 
 /* SpNone must remain zero; IDs are shared by rules, commands and bindings. */
 enum { SpTerm, SpFm, SpCalcu, SpVol, SpTop, SpDiscord, YtMsc};
-static const char *sptermcmd[] = { "st", "-n", "spterm", NULL };
-static const char *spcalccmd[] = { "st", "-n", "spcalc", "-e", "bc", "-lq", NULL };
 
 typedef struct {
   char *rule;
@@ -68,7 +56,14 @@ static Sp scratchpads[] = {
 };
 
 /* tagging */
-static const char *tags[] = { "1", "2", "3", "4", "7", "8", "9", "0" };
+static char *tags[] = {"1", "2", "3", "4", "5", "6", "7"};
+
+static const FullscreenRule fullscreenrules[] = {
+	/* class         instance    title    ignorefs */
+	{ NULL,          "spterm",   NULL,    1 },
+	{ NULL,          "spcalc",   NULL,    1 },
+	{ "Dragon-drop", NULL,       NULL,    1 },
+};
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -95,7 +90,7 @@ static const Rule rules[] = {
 };
 
 /* layout(s) */
-static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
+static const float mfact     = 0.45; /* factor of master area size [0.05..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
@@ -127,13 +122,23 @@ static const Layout layouts[] = {
   &((Keychord){1, {{ MODKEY,                       KEY}},      focusnthmon,    {.i  = TAG } }), \
   &((Keychord){1, {{ MODKEY|ShiftMask,             KEY}},      tagnthmon,      {.i  = TAG } }),
 
+// dmenu
+static const char dmenuln[] = "10";
+static const char dmenulh[] = "50";
+static const char dmenuwidth[] = "700";
+static const char dmenufont[] = "JetBrainsMono Nerd Font:style=Regular:size=15:antialias=true";
+static char dmenux[12];
+static char dmenuy[12];
+#define DMENUS(NAME,CMD) \
+  static const char *NAME[] = { CMD, "-x", dmenux, "-y", dmenuy, "-z", dmenuwidth, "-h", dmenulh, "-l", dmenuln,  NULL };
 
-/* helper for spawning shell commands in the pre dwm-5.0 fashion */
-#define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
+DMENUS(dmenucmd,   "dmenu_run")
+DMENUS(clipcmd,    "clipmenu")
+DMENUS(powermenu,  "power.sh")
+DMENUS(btmenu,     "bluetoothdmenu.sh")
+DMENUS(screenshot, "screenshot")
 
 /* commands */
-static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *termcmd[]  = { "alacritty", NULL };
 
 static const Keychord *keychords[] = {
