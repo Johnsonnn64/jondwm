@@ -119,8 +119,6 @@ static const Layout layouts[] = {
 	&((Keychord){1, {{ MODKEY|ControlMask,           KEY}},      toggleview,     {.ui = 1 << TAG} }), \
 	&((Keychord){1, {{ MODKEY|ShiftMask,             KEY}},      tag,            {.ui = 1 << TAG} }), \
 	&((Keychord){1, {{ MODKEY|ControlMask|ShiftMask, KEY}},      toggletag,      {.ui = 1 << TAG} }), \
-  &((Keychord){1, {{ MODKEY,                       KEY}},      focusnthmon,    {.i  = TAG } }), \
-  &((Keychord){1, {{ MODKEY|ShiftMask,             KEY}},      tagnthmon,      {.i  = TAG } }),
 
 // dmenu
 static const char dmenuln[] = "10";
@@ -183,18 +181,18 @@ static const Keychord *keychords[] = {
 	&((Keychord){1, {{MODKEY, XK_Return}}, zoom,           {0} }),
 	&((Keychord){1, {{MODKEY, XK_Tab}},    view,           {0} }),
 	&((Keychord){1, {{MODKEY, XK_q}},      killclient,     {0} }),
-	&((Keychord){1, {{MODKEY, XK_t}},      setlayout,      {.v = &layouts[0]} }),
-	&((Keychord){1, {{MODKEY, XK_f}},      setlayout,      {.v = &layouts[1]} }),
+	&((Keychord){1, {{MODKEY, XK_u}},      setlayout,      {.v = &layouts[0]} }),
+	&((Keychord){1, {{MODKEY, XK_t}},      setlayout,      {.v = &layouts[1]} }),
 	&((Keychord){1, {{MODKEY, XK_m}},      setlayout,      {.v = &layouts[2]} }),
 	&((Keychord){1, {{MODKEY, XK_space}},  setlayout,      {0} }),
 	&((Keychord){1, {{MODKEY|ShiftMask, XK_space}},  togglefloating, {0} }),
 	&((Keychord){1, {{MODKEY|ShiftMask, XK_f}},      togglefullscr,  {0} }),
 	&((Keychord){1, {{MODKEY, XK_0}},      view,           {.ui = ~0 } }),
 	&((Keychord){1, {{MODKEY|ShiftMask, XK_0}},      tag,            {.ui = ~0 } }),
-	&((Keychord){1, {{MODKEY, XK_comma}},  focusmon,       {.i = -1 } }),
-	&((Keychord){1, {{MODKEY, XK_period}}, focusmon,       {.i = +1 } }),
-	&((Keychord){1, {{MODKEY|ShiftMask, XK_comma}},  tagmon,         {.i = -1 } }),
-	&((Keychord){1, {{MODKEY|ShiftMask, XK_period}}, tagmon,         {.i = +1 } }),
+	&((Keychord){1, {{MODKEY, XK_comma}},  focusnthmon,       {.i = 1 } }),
+	&((Keychord){1, {{MODKEY, XK_period}}, focusnthmon,       {.i = 0 } }),
+	&((Keychord){1, {{MODKEY|ShiftMask, XK_comma}},  tagnthmon,         {.i = 1 } }),
+	&((Keychord){1, {{MODKEY|ShiftMask, XK_period}}, tagnthmon,         {.i = 0 } }),
 	&((Keychord){1, {{MODKEY, XK_f}}, togglefullscr,         {0} }),
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
@@ -204,7 +202,7 @@ static const Keychord *keychords[] = {
 	TAGKEYS(                        XK_8,                      5)
 	TAGKEYS(                        XK_9,                      6)
 	TAGKEYS(                        XK_0,                      7)
-  &((Keychord){1, {{MODKEY|ShiftMask,             XK_q}},      quit,           {0} }),
+  &((Keychord){1, {{MODKEY|ShiftMask,             XK_r}},      quit,           {1} }),
 };
 
 /* button definitions */
