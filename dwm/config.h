@@ -3,7 +3,7 @@
 /* Windows allowed above a custom fullscreen window.
  * Kept separate from Rule so this patch can be used without scratchpads. */
 /* appearance */
-static const unsigned int borderpx  = 3;        /* border pixel of windows */
+static const unsigned int borderpx  = 0;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const unsigned int gappih    = 20;       /* horiz inner gap between windows */
 static const unsigned int gappiv    = 20;       /* vert inner gap between windows */
@@ -121,7 +121,7 @@ static const Layout layouts[] = {
 
 // dmenu
 static const char dmenuln[] = "10";
-static const char dmenulh[] = "50";
+static const char dmenulh[] = "40";
 static const char dmenuwidth[] = "700";
 static char dmenux[12];
 static char dmenuy[12];
@@ -150,6 +150,7 @@ static const Keychord *keychords[] = {
 
 
   &((Keychord){1, {{MODKEY, XK_p}},      spawn,          {.v = dmenucmd } }),
+  &((Keychord){1, {{MODKEY, XK_Print}},  spawn,          {.v = screenshot } }),
   &((Keychord){1, {{MODKEY, XK_r}},      spawn,          {.v = termcmd } }),
   &((Keychord){1, {{MODKEY, XK_b}},      togglebar,      {0} }),
   &((Keychord){1, {{MODKEY, XK_j}},      focusstack,     {.i = +1 } }),
@@ -178,7 +179,7 @@ static const Keychord *keychords[] = {
   &((Keychord){1, {{MODKEY|ShiftMask, XK_l}},      setcfact,       {.f = -0.25} }),
   &((Keychord){1, {{MODKEY|ShiftMask, XK_o}},      setcfact,       {.f =  0.00} }),
   &((Keychord){1, {{MODKEY, XK_Return}}, zoom,           {0} }),
-  &((Keychord){1, {{MODKEY, XK_Tab}},    view,           {0} }),
+  &((Keychord){1, {{MODKEY, XK_Tab}},    spawn,           {.v = clipcmd} }),
   &((Keychord){1, {{MODKEY, XK_q}},      killclient,     {0} }),
   &((Keychord){1, {{MODKEY, XK_u}},      setlayout,      {.v = &layouts[0]} }),
   &((Keychord){1, {{MODKEY, XK_t}},      setlayout,      {.v = &layouts[1]} }),
