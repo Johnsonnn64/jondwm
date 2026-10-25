@@ -176,6 +176,9 @@ drw_clr_create(Drw *drw, Clr *dest, const char *clrname)
 	                       DefaultColormap(drw->dpy, drw->screen),
 	                       clrname, dest))
 		die("error, cannot allocate color '%s'", clrname);
+
+	/* Keep borders opaque when the client window uses an ARGB visual. */
+	dest->pixel |= 0xffUL << 24;
 }
 
 /* Create color schemes. */
