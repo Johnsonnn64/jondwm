@@ -215,12 +215,10 @@ static Monitor *createmon(void);
 static void destroynotify(XEvent *e);
 static void detach(Client *c);
 static void detachstack(Client *c);
-static Monitor *dirtomon(int dir);
 static Monitor *numtomon(int num);
 static void enternotify(XEvent *e);
 static void focus(Client *c);
 static void focusin(XEvent *e);
-static void focusmon(const Arg *arg);
 static void focusnthmon(const Arg *arg);
 static void focusstack(const Arg *arg);
 static Atom getatomprop(Client *c, Atom prop);
@@ -239,8 +237,8 @@ static void maprequest(XEvent *e);
 static void monocle(Monitor *m);
 static void motionnotify(XEvent *e);
 static void moveresize(const Arg *arg);
-static void moveresizeedge(const Arg *arg);
 static void movemouse(const Arg *arg);
+static void movecenter(const Arg *arg);
 static Client *nexttiled(Client *c);
 static void pop(Client *c);
 static void positionbar(Monitor *m);
@@ -275,7 +273,6 @@ static void showhide(Client *c);
 static void spawn(const Arg *arg);
 static void spawnbar();
 static void tag(const Arg *arg);
-static void tagmon(const Arg *arg);
 static void tagnthmon(const Arg *arg);
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
@@ -1005,21 +1002,6 @@ detachstack(Client *c)
 }
 
   Monitor *
-dirtomon(int dir)
-{
-  Monitor *m = NULL;
-
-  if (dir > 0) {
-    if (!(m = selmon->next))
-      m = mons;
-  } else if (selmon == mons)
-    for (m = mons; m->next; m = m->next);
-  else
-    for (m = mons; m->next != selmon; m = m->next);
-  return m;
-}
-
-  Monitor *
 numtomon(int num)
 {
   Monitor *m = NULL;
@@ -1084,22 +1066,6 @@ focusin(XEvent *e)
 
   if (selmon->sel && ev->window != selmon->sel->win)
     setfocus(selmon->sel);
-}
-
-  void
-focusmon(const Arg *arg)
-{
-  Monitor *m;
-
-  if (!mons->next)
-    return;
-  if ((m = dirtomon(arg->i)) == selmon)
-    return;
-  unfocus(selmon->sel, 0);
-  selmon = m;
-  focus(NULL);
-  if (selmon->sel)
-    XWarpPointer(dpy, None, selmon->sel->win, 0, 0, 0, 0, selmon->sel->w/2, selmon->sel->h/2);
 }
 
   void
@@ -1685,89 +1651,13 @@ moveresize(const Arg *arg) {
   }
 }
 
-void
-moveresizeedge(const Arg *arg) {
-  /* move or resize floating window to edge of screen */
-  Client *c;
-  c = selmon->sel;
-  char e;
-  int nx, ny, nw, nh, ox, oy, ow, oh, bp;
-  int msx, msy, dx, dy, nmx, nmy;
-  int starty;
-  unsigned int dui;
-  Window dummy;
-
-  nx = c->x;
-  ny = c->y;
-  nw = c->w;
-  nh = c->h;
-
-  starty = selmon->showbar && topbar ? bh : 0;
-  bp = selmon->showbar && !topbar ? bh : 0;
-
-  if (!c || !arg)
-    return;
-  if (selmon->lt[selmon->sellt]->arrange && !c->isfloating)
-    return;
-  if(sscanf((char *)arg->v, "%c", &e) != 1)
-    return;
-
-  if(e == 't')
-    ny = starty;
-
-  if(e == 'b')
-    ny = c->h > selmon->mh - 2 * c->bw ? c->h - bp : selmon->mh - c->h - 2 * c->bw - bp;
-
-  if(e == 'l')
-    nx = selmon->mx;
-
-  if(e == 'r')
-    nx = c->w > selmon->mw - 2 * c->bw ? selmon->mx + c->w : selmon->mx + selmon->mw - c->w - 2 * c->bw;
-
-  if(e == 'T') {
-    /* if you click to resize again, it will return to old size/position */
-    if(c->h + starty == c->oldh + c->oldy) {
-      nh = c->oldh;
-      ny = c->oldy;
-    } else {
-      nh = c->h + c->y - starty;
-      ny = starty;
-    }
-  }
-
-  if(e == 'B')
-    nh = c->h + c->y + 2 * c->bw + bp == selmon->mh ? c->oldh : selmon->mh - c->y - 2 * c->bw - bp;
-
-  if(e == 'L') {
-    if(selmon->mx + c->w == c->oldw + c->oldx) {
-      nw = c->oldw;
-      nx = c->oldx;
-    } else {
-      nw = c->w + c->x - selmon->mx;
-      nx = selmon->mx;
-    }
-  }
-
-  if(e == 'R')
-    nw = c->w + c->x + 2 * c->bw == selmon->mx + selmon->mw ? c->oldw : selmon->mx + selmon->mw - c->x - 2 * c->bw;
-
-  ox = c->x;
-  oy = c->y;
-  ow = c->w;
-  oh = c->h;
-
-  XRaiseWindow(dpy, c->win);
-  Bool xqp = XQueryPointer(dpy, root, &dummy, &dummy, &msx, &msy, &dx, &dy, &dui);
-  resizeclient(c, nx, ny, nw, nh);
-
-  /* move cursor along with the window to avoid problems caused by the sloppy focus */
-  if (xqp && ox <= msx && (ox + ow) >= msx && oy <= msy && (oy + oh) >= msy) {
-    nmx = c->x - ox + c->w - ow;
-    nmy = c->y - oy + c->h - oh;
-    /* make sure the cursor stays inside the window */
-    if ((msx + nmx) > c->x && (msy + nmy) > c->y)
-      XWarpPointer(dpy, None, None, 0, 0, 0, 0, nmx, nmy);
-  }
+  void
+movecenter(const Arg *arg)
+{
+  Client *c = selmon->sel;
+  c->x = selmon->mx + (c->mon->mw - WIDTH(c)) / 2;
+	c->y = selmon->my + (c->mon->mh - HEIGHT(c)) / 2;
+  arrange(selmon);
 }
 
   Client *
@@ -2393,14 +2283,6 @@ tag(const Arg *arg)
     focus(NULL);
     arrange(selmon);
   }
-}
-
-  void
-tagmon(const Arg *arg)
-{
-  if (!selmon->sel || !mons->next)
-    return;
-  sendmon(selmon->sel, dirtomon(arg->i));
 }
 
   void
